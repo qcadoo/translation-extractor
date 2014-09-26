@@ -1,6 +1,7 @@
 require "localizer/version"
 
 require "csv"
+require "java-properties"
 require "thor"
 
 module Localizer
@@ -61,10 +62,17 @@ DESC
 
   class Processor
 
+    Translation = Struct.new :pl, :en
+
     attr_reader :translations
 
     def initialize
       @translations = Hash.new
+    end
+
+    def add_translation locale, key, value
+      entry = translations[key] ||= Translation.new
+      entry[locale] = value
     end
 
     def recognize_file_type file_path
@@ -85,6 +93,9 @@ DESC
     end
 
     def read_properties locale, file_path
+      JavaProperties.load(file_path).each do |key, value|
+        add_translation locale, key, value
+      end
     end
 
     def read_ext locale, file_path
@@ -93,6 +104,9 @@ DESC
     def write_csv file_path
       csv = CSV.open file_path, "wb"
       csv << CSV_EXPORT_HEADER
+      translations.each do |key, value|
+        csv << [key, value.pl || "", value.en || ""]
+      end
     ensure
       csv && csv.close
     end
