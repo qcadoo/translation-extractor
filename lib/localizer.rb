@@ -5,6 +5,7 @@ require "thor"
 
 module Localizer
 
+  REX_LOCALE_FILE = /\Alocale[-_](?<locale>.+)\.(?<extension>js|javascript|properties)\Z/
   CSV_EXPORT_HEADER = ["Klucz", "Translacja polska", "Translacja angielska"]
 
   # When unsure how to modify this class, check: http://whatisthor.com/
@@ -29,8 +30,10 @@ DESC
       processor = Processor.new
 
       Dir.glob source_paths do |path|
-        type = processor.recognize_file_type path
-        processor.public_send "read_#{type}", path
+        catch :not_recognized do # skip not localizable files
+          locale, type = processor.recognize_file_type path
+          processor.public_send "read_#{type}", locale, path
+        end
       end
 
       processor.write_csv options[:output]
@@ -65,16 +68,26 @@ DESC
     end
 
     def recognize_file_type file_path
-      case File.extname file_path
-      when ".properties" then :properties
-      when ".js", ".javascript" then :ext
+      file_name = File.basename file_path
+
+      match = REX_LOCALE_FILE.match(File.basename file_path)
+
+      throw :not_recognized unless match
+
+      locale = match[:locale].to_sym
+
+      case match[:extension]
+      when "properties" then type = :properties
+      when "js", "javascript" then type = :ext
       end
+
+      [locale, type]
     end
 
-    def read_properties file_path
+    def read_properties locale, file_path
     end
 
-    def read_ext file_path
+    def read_ext locale, file_path
     end
 
     def write_csv file_path
