@@ -26,10 +26,14 @@ DESC
       type: :string, aliases: ["-o"],
       desc: "Translations CSV file to be (over)written."
     def export *source_paths
-      csv = CSV.open options[:output], "wb"
-      csv << CSV_EXPORT_HEADER
-    ensure
-      csv.close
+      processor = Processor.new
+
+      Dir.glob source_paths do |path|
+        type = processor.recognize_file_type path
+        processor.public_send "read_#{type}", path
+      end
+
+      processor.write_csv options[:output]
     end
 
 
@@ -50,4 +54,36 @@ DESC
     end
 
   end
+
+
+  class Processor
+
+    attr_reader :translations
+
+    def initialize
+      @translations = Hash.new
+    end
+
+    def recognize_file_type file_path
+      case File.extname file_path
+      when ".properties" then :properties
+      when ".js", ".javascript" then :ext
+      end
+    end
+
+    def read_properties file_path
+    end
+
+    def read_ext file_path
+    end
+
+    def write_csv file_path
+      csv = CSV.open file_path, "wb"
+      csv << CSV_EXPORT_HEADER
+    ensure
+      csv && csv.close
+    end
+
+  end
+
 end
