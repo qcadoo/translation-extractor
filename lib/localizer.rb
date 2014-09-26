@@ -1,5 +1,6 @@
 require "localizer/version"
 
+require "csv"
 require "thor"
 
 module Localizer
