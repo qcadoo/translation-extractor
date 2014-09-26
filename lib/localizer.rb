@@ -5,6 +5,8 @@ require "thor"
 
 module Localizer
 
+  CSV_EXPORT_HEADER = ["Klucz", "Translacja polska", "Translacja angielska"]
+
   # When unsure how to modify this class, check: http://whatisthor.com/
   # or: http://blog.paracode.com/2012/05/17/building-your-tools-with-thor/
   class CLI < Thor
@@ -24,6 +26,10 @@ DESC
       type: :string, aliases: ["-o"],
       desc: "Translations CSV file to be (over)written."
     def export *source_paths
+      csv = CSV.open options[:output], "wb"
+      csv << CSV_EXPORT_HEADER
+    ensure
+      csv.close
     end
 
 
