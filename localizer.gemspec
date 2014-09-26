@@ -11,7 +11,7 @@ Gem::Specification.new do |spec|
   spec.summary       = %q{Localizes Ext JS and Java properties}
   spec.description   = nil
   spec.homepage      = ""
-  spec.license       = "MIT"
+  spec.license       = "Not sure, ask qcadoo.com"
 
   spec.files         = `git ls-files -z`.split("\x0")
   spec.executables   = spec.files.grep(%r{^bin/}) { |f| File.basename(f) }
