@@ -55,6 +55,16 @@ DESC
     option :input, type: :string, aliases: ["-i"],
       desc: "CSV file with translations"
     def import *source_paths
+      processor = Processor.new
+
+      processor.read_csv options[:input]
+
+      Dir.glob source_paths do |path|
+        catch :not_recognized do # skip not localizable files
+          locale, type = processor.recognize_file_type path
+          processor.public_send "write_#{type}", locale, path
+        end
+      end
     end
 
   end
@@ -98,7 +108,21 @@ DESC
       end
     end
 
+    def write_properties locale, file_path
+      translations_in_locale = translations.map do |k,entry|
+        [k, (entry.send locale)]
+      end
+      JavaProperties.write translations_in_locale, file_path
+    end
+
     def read_ext locale, file_path
+    end
+
+    def read_csv file_path
+      CSV.foreach file_path, headers: :first_row do |row|
+        add_translation :pl, row[0], row[1]
+        add_translation :en, row[0], row[2]
+      end
     end
 
     def write_csv file_path
