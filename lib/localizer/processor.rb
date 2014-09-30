@@ -45,6 +45,9 @@ module Localizer
     end
 
     def read_ext locale, file_path
+      source = File.read file_path
+      parser = Localizer::Parser::ExtReader.new source
+      parser.parse
     end
 
     def read_csv file_path
