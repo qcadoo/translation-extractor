@@ -14,6 +14,20 @@ module Localizer
 
   module Parser
     autoload :Ext, "localizer/parser/ext.kpeg"
+    autoload :Common, "localizer/parser/common"
+    autoload :Reader, "localizer/parser/reader"
+    autoload :Writer, "localizer/parser/writer"
+
+    class ExtReader < Ext
+      include Common
+      include Reader
+    end
+
+    class ExtWriter < Ext
+      include Common
+      include Writer
+    end
+
   end
 
 end
