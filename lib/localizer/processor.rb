@@ -40,6 +40,8 @@ module Localizer
     def read_ext locale, file_path
       source = File.read file_path
       parser = Localizer::Parser::ExtReader.new source
+      parser.locale = locale
+      parser.translations = translations
       parser.parse
     end
 
