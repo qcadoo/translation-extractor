@@ -1,1 +1,46 @@
 %% name = Localizer::Parser::Ext
+
+root = lines("")
+
+lines(prefix) = (line(prefix)*):lines { lines.count }
+
+line(prefix) = relevant(prefix)
+             | block(prefix)
+             | junk
+
+relevant(prefix) = single_call(prefix)
+                 | scope(prefix)
+
+block(prefix) = OPEN lines(prefix) CLOSE
+
+scope(prefix)       = EXT DOT meth_of_type("scope"):ident
+                      LPAREN string:param COMMA
+                      ~join_keys(prefix, param):new_prefix
+                      block(new_prefix)
+                      RPAREN
+
+single_call(prefix) = THIS DOT meth_of_type("setter"):ident
+                      LPAREN string:text RPAREN
+                      ~setter(prefix, ident, text)
+
+string = STRING:raw ~make_string(raw)
+
+meth_of_type(type) = IDENTIFIER:i &{ matches_type? i, type } { i }
+
+junk = SEPARATOR
+     | JUNK_EXPR
+
+JUNK_EXPR = </[^;{}]+/>  { nil }
+SEPARATOR = </\s*\;\s*/> { nil }
+OPEN      = </\s*\{\s*/> { nil }
+CLOSE     = </\s*\}\s*/> { nil }
+LPAREN    = </\s*\(\s*/> { nil }
+RPAREN    = </\s*\)\s*/> { nil }
+COMMA     = </\s*\,\s*/> { nil }
+STRING    = </\'([^']|\\.)*\'|\"([^"]|\\.)*\"/> { text }
+
+DOT  = "."
+EXT  = "Ext"
+THIS = "this"
+
+IDENTIFIER = </\w+/> { text }

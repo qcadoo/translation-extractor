@@ -54,6 +54,21 @@ describe "Localizer" do
     end
   end
 
+  example "generating CSV from single JS source" do
+    js_path = fixture_path("locale-en.js")
+    output_file = Tempfile.new(%w[translations .csv], tmp_dir)
+
+    run "export", "-o", output_file.path, js_path
+    out = CSV.read output_file
+
+    out.should_not be_empty
+
+    out.should == [
+      ["Klucz", "Translacja polska", "Translacja angielska"],
+      ["ads.locale.en.view.project.List.title", "", "Projects"],
+    ]
+  end
+
   def run command, *args
     Localizer::CLI.start [command, *args.flatten]
   end
