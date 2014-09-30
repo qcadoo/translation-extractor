@@ -28,7 +28,6 @@ module Localizer
       include Common
       include Writer
     end
-
   end
 
 end
