@@ -12,4 +12,8 @@ module Localizer
   autoload :CLI, "localizer/cli"
   autoload :Processor, "localizer/processor"
 
+  module Parser
+    autoload :Ext, "localizer/parser/ext.kpeg"
+  end
+
 end
