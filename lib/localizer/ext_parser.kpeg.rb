@@ -1,6 +1,6 @@
 require 'kpeg/compiled_parser'
 
-class Localizer::ExtGrammar < KPeg::CompiledParser
+class Localizer::ExtParser < KPeg::CompiledParser
   # :stopdoc:
 
   Rules = {}
