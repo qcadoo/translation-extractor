@@ -1,5 +1,6 @@
 require "localizer/version"
 
+require "active_support/all"
 require "csv"
 require "java-properties"
 require "thor"
