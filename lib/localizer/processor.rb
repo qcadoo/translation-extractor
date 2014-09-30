@@ -1,17 +1,10 @@
 module Localizer
   class Processor
 
-    Translation = Struct.new :pl, :en
-
     attr_reader :translations
 
     def initialize
-      @translations = Hash.new
-    end
-
-    def add_translation locale, key, value
-      entry = translations[key] ||= Translation.new
-      entry[locale] = value
+      @translations = Localizer::Translations.new
     end
 
     def recognize_file_type file_path
@@ -33,7 +26,7 @@ module Localizer
 
     def read_properties locale, file_path
       JavaProperties.load(file_path).each do |key, value|
-        add_translation locale, key, value
+        translations.add locale, key, value
       end
     end
 
@@ -52,8 +45,8 @@ module Localizer
 
     def read_csv file_path
       CSV.foreach file_path, headers: :first_row do |row|
-        add_translation :pl, row[0], row[1]
-        add_translation :en, row[0], row[2]
+        translations.add :pl, row[0], row[1]
+        translations.add :en, row[0], row[2]
       end
     end
 
