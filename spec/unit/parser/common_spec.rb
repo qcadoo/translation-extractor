@@ -11,6 +11,12 @@ describe "Localizer::Parser::Common" do
     example "define matches scope type" do
       subject.matches_type?("define", "scope").should be_truthy
     end
+    example "nearlyAnything matches attribute type" do
+      subject.matches_type?("nearlyAnything", "attribute").should be_truthy
+    end
+    example "override does not match attribute type" do
+      subject.matches_type?("override", "attribute").should be_falsey
+    end
   end
 
   describe "translate_setter_to_key" do
