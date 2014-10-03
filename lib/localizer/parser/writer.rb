@@ -1,5 +1,6 @@
 module Localizer::Parser::Writer
 
+  # Handles setter in JS source.  Returns translated parameter.
   def setter prefix, ident, text
     key = join_keys prefix, translate_setter_to_key(ident)
     translated = translations[key].send locale

@@ -7,6 +7,8 @@ module Localizer
       @translations = Localizer::Translations.new
     end
 
+    # Recognizes translatable Java properties files and JavaScript sources.
+    # Throws :not_recognized when file could not be recognized.
     def recognize_file_type file_path
       file_name = File.basename file_path
 
@@ -24,12 +26,14 @@ module Localizer
       [locale, type]
     end
 
+    # Reads properties file and adds new translations.
     def read_properties locale, file_path
       JavaProperties.load(file_path).each do |key, value|
         translations.add locale, key, value
       end
     end
 
+    # Dumps all the translations in given locale to properties file.
     def write_properties locale, file_path
       translations_in_locale = translations.map do |k,entry|
         [k, (entry.send locale)]
@@ -37,6 +41,7 @@ module Localizer
       JavaProperties.write translations_in_locale, file_path
     end
 
+    # Parses JS source and adds any found translations to database.
     def read_ext locale, file_path
       source = File.read file_path
       parser = Localizer::Parser::ExtReader.new source
@@ -45,6 +50,7 @@ module Localizer
       parser.parse
     end
 
+    # Parses JS source and updates it with new translations.
     def write_ext locale, file_path
       source = File.read file_path
       parser = Localizer::Parser::ExtWriter.new source
@@ -54,6 +60,8 @@ module Localizer
       File.write file_path, parser.result
     end
 
+    # Reads translations from CSV.  Makes expectations on header and raises
+    # exceptions when not met.
     def read_csv file_path
       csv = CSV.read file_path, headers: :first_row
       csv.headers == CSV_IMPORT_HEADER or raise "CSV header mismatch"
@@ -63,6 +71,7 @@ module Localizer
       end
     end
 
+    # Dumps translations to CSV file.
     def write_csv file_path
       csv = CSV.open file_path, "wb"
       csv << CSV_EXPORT_HEADER
