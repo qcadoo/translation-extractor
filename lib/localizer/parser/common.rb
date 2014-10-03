@@ -6,6 +6,10 @@ module Localizer::Parser::Common
     def to_s
       raw[1..-2]
     end
+
+    def new_string_with_same_quotation str
+      self.class.new "" << raw[0] << str << raw[-1]
+    end
   end
 
   def make_string raw_string

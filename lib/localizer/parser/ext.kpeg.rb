@@ -40,57 +40,19 @@ class Localizer::Parser::Ext < KPeg::CompiledParser
     return _tmp
   end
 
-  # line = (< relevant(prefix) > { text } | < block(prefix) > { text } | < junk > { text })
+  # line = (relevant(prefix) | block(prefix) | < junk > { text })
   def _line(prefix)
 
     _save = self.pos
     while true # choice
+      _tmp = apply_with_args(:_relevant, prefix)
+      break if _tmp
+      self.pos = _save
+      _tmp = apply_with_args(:_block, prefix)
+      break if _tmp
+      self.pos = _save
 
       _save1 = self.pos
-      while true # sequence
-        _text_start = self.pos
-        _tmp = apply_with_args(:_relevant, prefix)
-        if _tmp
-          text = get_text(_text_start)
-        end
-        unless _tmp
-          self.pos = _save1
-          break
-        end
-        @result = begin;  text ; end
-        _tmp = true
-        unless _tmp
-          self.pos = _save1
-        end
-        break
-      end # end sequence
-
-      break if _tmp
-      self.pos = _save
-
-      _save2 = self.pos
-      while true # sequence
-        _text_start = self.pos
-        _tmp = apply_with_args(:_block, prefix)
-        if _tmp
-          text = get_text(_text_start)
-        end
-        unless _tmp
-          self.pos = _save2
-          break
-        end
-        @result = begin;  text ; end
-        _tmp = true
-        unless _tmp
-          self.pos = _save2
-        end
-        break
-      end # end sequence
-
-      break if _tmp
-      self.pos = _save
-
-      _save3 = self.pos
       while true # sequence
         _text_start = self.pos
         _tmp = apply(:_junk)
@@ -98,13 +60,13 @@ class Localizer::Parser::Ext < KPeg::CompiledParser
           text = get_text(_text_start)
         end
         unless _tmp
-          self.pos = _save3
+          self.pos = _save1
           break
         end
         @result = begin;  text ; end
         _tmp = true
         unless _tmp
-          self.pos = _save3
+          self.pos = _save1
         end
         break
       end # end sequence
@@ -136,22 +98,31 @@ class Localizer::Parser::Ext < KPeg::CompiledParser
     return _tmp
   end
 
-  # block = OPEN lines(prefix) CLOSE
+  # block = OPEN:op lines(prefix):li CLOSE:cl { [op, li, cl] }
   def _block(prefix)
 
     _save = self.pos
     while true # sequence
       _tmp = apply(:_OPEN)
+      op = @result
       unless _tmp
         self.pos = _save
         break
       end
       _tmp = apply_with_args(:_lines, prefix)
+      li = @result
       unless _tmp
         self.pos = _save
         break
       end
       _tmp = apply(:_CLOSE)
+      cl = @result
+      unless _tmp
+        self.pos = _save
+        break
+      end
+      @result = begin;  [op, li, cl] ; end
+      _tmp = true
       unless _tmp
         self.pos = _save
       end
@@ -162,39 +133,52 @@ class Localizer::Parser::Ext < KPeg::CompiledParser
     return _tmp
   end
 
-  # scope = EXT DOT meth_of_type("scope"):ident LPAREN string:param COMMA {join_keys(prefix, param)}:new_prefix block(new_prefix) RPAREN
+  # scope = < EXT DOT meth_of_type("scope"):ident LPAREN string:param COMMA > {join_keys(prefix, param)}:new_prefix block(new_prefix):lines_src RPAREN:right_src { [text, lines_src, right_src] }
   def _scope(prefix)
 
     _save = self.pos
     while true # sequence
-      _tmp = apply(:_EXT)
-      unless _tmp
-        self.pos = _save
+      _text_start = self.pos
+
+      _save1 = self.pos
+      while true # sequence
+        _tmp = apply(:_EXT)
+        unless _tmp
+          self.pos = _save1
+          break
+        end
+        _tmp = apply(:_DOT)
+        unless _tmp
+          self.pos = _save1
+          break
+        end
+        _tmp = apply_with_args(:_meth_of_type, "scope")
+        ident = @result
+        unless _tmp
+          self.pos = _save1
+          break
+        end
+        _tmp = apply(:_LPAREN)
+        unless _tmp
+          self.pos = _save1
+          break
+        end
+        _tmp = apply(:_string)
+        param = @result
+        unless _tmp
+          self.pos = _save1
+          break
+        end
+        _tmp = apply(:_COMMA)
+        unless _tmp
+          self.pos = _save1
+        end
         break
+      end # end sequence
+
+      if _tmp
+        text = get_text(_text_start)
       end
-      _tmp = apply(:_DOT)
-      unless _tmp
-        self.pos = _save
-        break
-      end
-      _tmp = apply_with_args(:_meth_of_type, "scope")
-      ident = @result
-      unless _tmp
-        self.pos = _save
-        break
-      end
-      _tmp = apply(:_LPAREN)
-      unless _tmp
-        self.pos = _save
-        break
-      end
-      _tmp = apply(:_string)
-      param = @result
-      unless _tmp
-        self.pos = _save
-        break
-      end
-      _tmp = apply(:_COMMA)
       unless _tmp
         self.pos = _save
         break
@@ -207,11 +191,19 @@ class Localizer::Parser::Ext < KPeg::CompiledParser
         break
       end
       _tmp = apply_with_args(:_block, new_prefix)
+      lines_src = @result
       unless _tmp
         self.pos = _save
         break
       end
       _tmp = apply(:_RPAREN)
+      right_src = @result
+      unless _tmp
+        self.pos = _save
+        break
+      end
+      @result = begin;  [text, lines_src, right_src] ; end
+      _tmp = true
       unless _tmp
         self.pos = _save
       end
@@ -222,28 +214,41 @@ class Localizer::Parser::Ext < KPeg::CompiledParser
     return _tmp
   end
 
-  # single_call = THIS DOT meth_of_type("setter"):ident LPAREN string:value RPAREN {setter(prefix, ident, value)}
+  # single_call = < THIS DOT meth_of_type("setter"):ident LPAREN > string:value RPAREN:right_src {setter(prefix, ident, value)}:translated_value { [text, translated_value, right_src] }
   def _single_call(prefix)
 
     _save = self.pos
     while true # sequence
-      _tmp = apply(:_THIS)
-      unless _tmp
-        self.pos = _save
+      _text_start = self.pos
+
+      _save1 = self.pos
+      while true # sequence
+        _tmp = apply(:_THIS)
+        unless _tmp
+          self.pos = _save1
+          break
+        end
+        _tmp = apply(:_DOT)
+        unless _tmp
+          self.pos = _save1
+          break
+        end
+        _tmp = apply_with_args(:_meth_of_type, "setter")
+        ident = @result
+        unless _tmp
+          self.pos = _save1
+          break
+        end
+        _tmp = apply(:_LPAREN)
+        unless _tmp
+          self.pos = _save1
+        end
         break
+      end # end sequence
+
+      if _tmp
+        text = get_text(_text_start)
       end
-      _tmp = apply(:_DOT)
-      unless _tmp
-        self.pos = _save
-        break
-      end
-      _tmp = apply_with_args(:_meth_of_type, "setter")
-      ident = @result
-      unless _tmp
-        self.pos = _save
-        break
-      end
-      _tmp = apply(:_LPAREN)
       unless _tmp
         self.pos = _save
         break
@@ -255,11 +260,19 @@ class Localizer::Parser::Ext < KPeg::CompiledParser
         break
       end
       _tmp = apply(:_RPAREN)
+      right_src = @result
       unless _tmp
         self.pos = _save
         break
       end
       @result = begin; setter(prefix, ident, value); end
+      _tmp = true
+      translated_value = @result
+      unless _tmp
+        self.pos = _save
+        break
+      end
+      @result = begin;  [text, translated_value, right_src] ; end
       _tmp = true
       unless _tmp
         self.pos = _save
@@ -394,7 +407,7 @@ class Localizer::Parser::Ext < KPeg::CompiledParser
     return _tmp
   end
 
-  # OPEN = < /\s*\{\s*/ > { nil }
+  # OPEN = < /\s*\{\s*/ > { text }
   def _OPEN
 
     _save = self.pos
@@ -408,7 +421,7 @@ class Localizer::Parser::Ext < KPeg::CompiledParser
         self.pos = _save
         break
       end
-      @result = begin;  nil ; end
+      @result = begin;  text ; end
       _tmp = true
       unless _tmp
         self.pos = _save
@@ -420,7 +433,7 @@ class Localizer::Parser::Ext < KPeg::CompiledParser
     return _tmp
   end
 
-  # CLOSE = < /\s*\}\s*/ > { nil }
+  # CLOSE = < /\s*\}\s*/ > { text }
   def _CLOSE
 
     _save = self.pos
@@ -434,7 +447,7 @@ class Localizer::Parser::Ext < KPeg::CompiledParser
         self.pos = _save
         break
       end
-      @result = begin;  nil ; end
+      @result = begin;  text ; end
       _tmp = true
       unless _tmp
         self.pos = _save
@@ -446,7 +459,7 @@ class Localizer::Parser::Ext < KPeg::CompiledParser
     return _tmp
   end
 
-  # LPAREN = < /\s*\(\s*/ > { nil }
+  # LPAREN = < /\s*\(\s*/ > { text }
   def _LPAREN
 
     _save = self.pos
@@ -460,7 +473,7 @@ class Localizer::Parser::Ext < KPeg::CompiledParser
         self.pos = _save
         break
       end
-      @result = begin;  nil ; end
+      @result = begin;  text ; end
       _tmp = true
       unless _tmp
         self.pos = _save
@@ -472,7 +485,7 @@ class Localizer::Parser::Ext < KPeg::CompiledParser
     return _tmp
   end
 
-  # RPAREN = < /\s*\)\s*/ > { nil }
+  # RPAREN = < /\s*\)\s*/ > { text }
   def _RPAREN
 
     _save = self.pos
@@ -486,7 +499,7 @@ class Localizer::Parser::Ext < KPeg::CompiledParser
         self.pos = _save
         break
       end
-      @result = begin;  nil ; end
+      @result = begin;  text ; end
       _tmp = true
       unless _tmp
         self.pos = _save
@@ -600,20 +613,20 @@ class Localizer::Parser::Ext < KPeg::CompiledParser
   Rules = {}
   Rules[:_root] = rule_info("root", "lines(\"\")")
   Rules[:_lines] = rule_info("lines", "line(prefix)*:lines { lines.flatten.join }")
-  Rules[:_line] = rule_info("line", "(< relevant(prefix) > { text } | < block(prefix) > { text } | < junk > { text })")
+  Rules[:_line] = rule_info("line", "(relevant(prefix) | block(prefix) | < junk > { text })")
   Rules[:_relevant] = rule_info("relevant", "(single_call(prefix) | scope(prefix))")
-  Rules[:_block] = rule_info("block", "OPEN lines(prefix) CLOSE")
-  Rules[:_scope] = rule_info("scope", "EXT DOT meth_of_type(\"scope\"):ident LPAREN string:param COMMA {join_keys(prefix, param)}:new_prefix block(new_prefix) RPAREN")
-  Rules[:_single_call] = rule_info("single_call", "THIS DOT meth_of_type(\"setter\"):ident LPAREN string:value RPAREN {setter(prefix, ident, value)}")
+  Rules[:_block] = rule_info("block", "OPEN:op lines(prefix):li CLOSE:cl { [op, li, cl] }")
+  Rules[:_scope] = rule_info("scope", "< EXT DOT meth_of_type(\"scope\"):ident LPAREN string:param COMMA > {join_keys(prefix, param)}:new_prefix block(new_prefix):lines_src RPAREN:right_src { [text, lines_src, right_src] }")
+  Rules[:_single_call] = rule_info("single_call", "< THIS DOT meth_of_type(\"setter\"):ident LPAREN > string:value RPAREN:right_src {setter(prefix, ident, value)}:translated_value { [text, translated_value, right_src] }")
   Rules[:_string] = rule_info("string", "STRING:raw {make_string(raw)}")
   Rules[:_meth_of_type] = rule_info("meth_of_type", "IDENTIFIER:i &{ matches_type? i, type } { i }")
   Rules[:_junk] = rule_info("junk", "(SEPARATOR | JUNK_EXPR)")
   Rules[:_JUNK_EXPR] = rule_info("JUNK_EXPR", "< /[^;{}]+/ > { nil }")
   Rules[:_SEPARATOR] = rule_info("SEPARATOR", "< /\\s*\\;\\s*/ > { nil }")
-  Rules[:_OPEN] = rule_info("OPEN", "< /\\s*\\{\\s*/ > { nil }")
-  Rules[:_CLOSE] = rule_info("CLOSE", "< /\\s*\\}\\s*/ > { nil }")
-  Rules[:_LPAREN] = rule_info("LPAREN", "< /\\s*\\(\\s*/ > { nil }")
-  Rules[:_RPAREN] = rule_info("RPAREN", "< /\\s*\\)\\s*/ > { nil }")
+  Rules[:_OPEN] = rule_info("OPEN", "< /\\s*\\{\\s*/ > { text }")
+  Rules[:_CLOSE] = rule_info("CLOSE", "< /\\s*\\}\\s*/ > { text }")
+  Rules[:_LPAREN] = rule_info("LPAREN", "< /\\s*\\(\\s*/ > { text }")
+  Rules[:_RPAREN] = rule_info("RPAREN", "< /\\s*\\)\\s*/ > { text }")
   Rules[:_COMMA] = rule_info("COMMA", "< /\\s*\\,\\s*/ > { nil }")
   Rules[:_STRING] = rule_info("STRING", "< /\\'([^']|\\\\.)*\\'|\\\"([^\"]|\\\\.)*\\\"/ > { text }")
   Rules[:_DOT] = rule_info("DOT", "\".\"")

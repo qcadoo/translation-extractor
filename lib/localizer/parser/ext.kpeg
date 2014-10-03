@@ -4,24 +4,26 @@ root = lines("")
 
 lines(prefix) = (line(prefix)*):lines { lines.flatten.join }
 
-line(prefix) = < relevant(prefix) > { text }
-             | < block(prefix) > { text }
+line(prefix) = relevant(prefix)
+             | block(prefix)
              | < junk > { text }
 
 relevant(prefix) = single_call(prefix)
                  | scope(prefix)
 
-block(prefix) = OPEN lines(prefix) CLOSE
+block(prefix) = OPEN:op lines(prefix):li CLOSE:cl { [op, li, cl] }
 
-scope(prefix)       = EXT DOT meth_of_type("scope"):ident
-                      LPAREN string:param COMMA
+scope(prefix)       = < EXT DOT meth_of_type("scope"):ident
+                      LPAREN string:param COMMA >
                       ~join_keys(prefix, param):new_prefix
-                      block(new_prefix)
-                      RPAREN
+                      block(new_prefix):lines_src
+                      RPAREN:right_src
+                      { [text, lines_src, right_src] }
 
-single_call(prefix) = THIS DOT meth_of_type("setter"):ident
-                      LPAREN string:value RPAREN
-                      ~setter(prefix, ident, value)
+single_call(prefix) = < THIS DOT meth_of_type("setter"):ident
+                      LPAREN > string:value RPAREN:right_src
+                      ~setter(prefix, ident, value):translated_value
+                      { [text, translated_value, right_src] }
 
 string = STRING:raw ~make_string(raw)
 
@@ -32,10 +34,10 @@ junk = SEPARATOR
 
 JUNK_EXPR = </[^;{}]+/>  { nil }
 SEPARATOR = </\s*\;\s*/> { nil }
-OPEN      = </\s*\{\s*/> { nil }
-CLOSE     = </\s*\}\s*/> { nil }
-LPAREN    = </\s*\(\s*/> { nil }
-RPAREN    = </\s*\)\s*/> { nil }
+OPEN      = </\s*\{\s*/> { text }
+CLOSE     = </\s*\}\s*/> { text }
+LPAREN    = </\s*\(\s*/> { text }
+RPAREN    = </\s*\)\s*/> { text }
 COMMA     = </\s*\,\s*/> { nil }
 STRING    = </\'([^']|\\.)*\'|\"([^"]|\\.)*\"/> { text }
 
