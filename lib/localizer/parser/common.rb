@@ -9,7 +9,8 @@ module Localizer::Parser::Common
       raw[1..-2]
     end
 
-    def new_string_with_same_quotation str
+    # Returns new ParsedString with new content but same quotation marks.
+    def replace_with str
       self.class.new "" << raw[0] << str << raw[-1]
     end
   end
