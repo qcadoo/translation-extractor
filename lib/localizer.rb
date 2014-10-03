@@ -7,9 +7,13 @@ require "thor"
 
 module Localizer
 
-  REX_LOCALE_FILE = /\Alocale[-_](?<locale>.+)\.(?<extension>js|javascript|properties)\Z/
-  CSV_EXPORT_HEADER = ["Klucz", "Translacja polska", "Translacja angielska"]
-  CSV_IMPORT_HEADER = ["Klucz", "Translacja polska", "Translacja angielska", "Nowa translacja polska", "Nowa translacja angielska"]
+  REX_LOCALE_FILE =
+    /\Alocale[-_](?<locale>.+)\.(?<extension>js|javascript|properties)\Z/
+  CSV_EXPORT_HEADER =
+    ["Klucz", "Translacja polska", "Translacja angielska"]
+  CSV_IMPORT_HEADER =
+    ["Klucz", "Translacja polska", "Translacja angielska",
+    "Nowa translacja polska", "Nowa translacja angielska"]
 
   autoload :CLI, "localizer/cli"
   autoload :Processor, "localizer/processor"
