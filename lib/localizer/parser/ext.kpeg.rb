@@ -214,7 +214,7 @@ class Localizer::Parser::Ext < KPeg::CompiledParser
     return _tmp
   end
 
-  # single_call = < THIS DOT meth_of_type("setter"):ident LPAREN > string:value RPAREN:right_src {setter(prefix, ident, value)}:translated_value { [text, translated_value, right_src] }
+  # single_call = < THIS DOT meth_of_type("setter"):ident LPAREN > string:value RPAREN:right_src {translate_setter_to_key(ident)}:key {translate(prefix, key, value)}:translated_value { [text, translated_value, right_src] }
   def _single_call(prefix)
 
     _save = self.pos
@@ -265,7 +265,14 @@ class Localizer::Parser::Ext < KPeg::CompiledParser
         self.pos = _save
         break
       end
-      @result = begin; setter(prefix, ident, value); end
+      @result = begin; translate_setter_to_key(ident); end
+      _tmp = true
+      key = @result
+      unless _tmp
+        self.pos = _save
+        break
+      end
+      @result = begin; translate(prefix, key, value); end
       _tmp = true
       translated_value = @result
       unless _tmp
@@ -617,7 +624,7 @@ class Localizer::Parser::Ext < KPeg::CompiledParser
   Rules[:_relevant] = rule_info("relevant", "(single_call(prefix) | scope(prefix))")
   Rules[:_block] = rule_info("block", "OPEN:op lines(prefix):li CLOSE:cl { [op, li, cl] }")
   Rules[:_scope] = rule_info("scope", "< EXT DOT meth_of_type(\"scope\"):ident LPAREN string:param COMMA > {join_keys(prefix, param)}:new_prefix block(new_prefix):lines_src RPAREN:right_src { [text, lines_src, right_src] }")
-  Rules[:_single_call] = rule_info("single_call", "< THIS DOT meth_of_type(\"setter\"):ident LPAREN > string:value RPAREN:right_src {setter(prefix, ident, value)}:translated_value { [text, translated_value, right_src] }")
+  Rules[:_single_call] = rule_info("single_call", "< THIS DOT meth_of_type(\"setter\"):ident LPAREN > string:value RPAREN:right_src {translate_setter_to_key(ident)}:key {translate(prefix, key, value)}:translated_value { [text, translated_value, right_src] }")
   Rules[:_string] = rule_info("string", "STRING:raw {make_string(raw)}")
   Rules[:_meth_of_type] = rule_info("meth_of_type", "IDENTIFIER:i &{ matches_type? i, type } { i }")
   Rules[:_junk] = rule_info("junk", "(SEPARATOR | JUNK_EXPR)")

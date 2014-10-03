@@ -22,7 +22,8 @@ scope(prefix)       = < EXT DOT meth_of_type("scope"):ident
 
 single_call(prefix) = < THIS DOT meth_of_type("setter"):ident
                       LPAREN > string:value RPAREN:right_src
-                      ~setter(prefix, ident, value):translated_value
+                      ~translate_setter_to_key(ident):key
+                      ~translate(prefix, key, value):translated_value
                       { [text, translated_value, right_src] }
 
 string = STRING:raw ~make_string(raw)
