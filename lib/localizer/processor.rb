@@ -46,9 +46,11 @@ module Localizer
     end
 
     def read_csv file_path
-      CSV.foreach file_path, headers: :first_row do |row|
-        translations.add :pl, row[0], row[1]
-        translations.add :en, row[0], row[2]
+      csv = CSV.read file_path, headers: :first_row
+      csv.headers == CSV_IMPORT_HEADER or raise "CSV header mismatch"
+      csv.each do |row|
+        translations.add :pl, row[0], row[3]
+        translations.add :en, row[0], row[4]
       end
     end
 
