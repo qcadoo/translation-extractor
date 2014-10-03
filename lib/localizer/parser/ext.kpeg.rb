@@ -10,7 +10,7 @@ class Localizer::Parser::Ext < KPeg::CompiledParser
     return _tmp
   end
 
-  # lines = line(prefix)*:lines { lines.flatten.join }
+  # lines = line(prefix)*:lines {output(lines)}
   def _lines(prefix)
 
     _save = self.pos
@@ -28,7 +28,7 @@ class Localizer::Parser::Ext < KPeg::CompiledParser
         self.pos = _save
         break
       end
-      @result = begin;  lines.flatten.join ; end
+      @result = begin; output(lines); end
       _tmp = true
       unless _tmp
         self.pos = _save
@@ -612,7 +612,7 @@ class Localizer::Parser::Ext < KPeg::CompiledParser
 
   Rules = {}
   Rules[:_root] = rule_info("root", "lines(\"\")")
-  Rules[:_lines] = rule_info("lines", "line(prefix)*:lines { lines.flatten.join }")
+  Rules[:_lines] = rule_info("lines", "line(prefix)*:lines {output(lines)}")
   Rules[:_line] = rule_info("line", "(relevant(prefix) | block(prefix) | < junk > { text })")
   Rules[:_relevant] = rule_info("relevant", "(single_call(prefix) | scope(prefix))")
   Rules[:_block] = rule_info("block", "OPEN:op lines(prefix):li CLOSE:cl { [op, li, cl] }")

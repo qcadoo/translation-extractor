@@ -5,4 +5,11 @@ module Localizer::Parser::Reader
     translations.add locale, key, text
   end
 
+  # Produces parser output.  Irrelevant for Reader as it relies on modifying
+  # state. (Which is generally very wrong in PEGs but all modifications are
+  # guarded with conditions which could be "cut" operations in other languages.)
+  def output lines
+    nil
+  end
+
 end

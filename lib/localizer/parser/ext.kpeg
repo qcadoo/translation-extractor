@@ -2,7 +2,7 @@
 
 root = lines("")
 
-lines(prefix) = (line(prefix)*):lines { lines.flatten.join }
+lines(prefix) = (line(prefix)*):lines ~output(lines)
 
 line(prefix) = relevant(prefix)
              | block(prefix)
