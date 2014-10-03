@@ -35,7 +35,7 @@ chained_call(prefix) = < THIS DOT meth_of_type("finder"):ident
                       ~translate(prefix, key, value):translated_value
                       { [text, translated_value, right_src] }
 
-attribute(prefix)   = < meth_of_type("any"):key COLON > STRING:value
+attribute(prefix)   = < meth_of_type("attribute"):key COLON > STRING:value
                       COMMA:right_src
                       ~translate(prefix, key, value):translated_value
                       { [text, translated_value, right_src] }
@@ -43,9 +43,10 @@ attribute(prefix)   = < meth_of_type("any"):key COLON > STRING:value
 meth_of_type(type) = IDENTIFIER:i &{ matches_type? i, type } { i }
 
 junk = SEPARATOR
+     | COMMA
      | JUNK_EXPR
 
-JUNK_EXPR = </[^;{}]+/>  { nil }
+JUNK_EXPR = </[^;,{}]+/> { nil }
 SEPARATOR = </\s*\;\s*/> { nil }
 OPEN      = </\s*\{\s*/> { text }
 CLOSE     = </\s*\}\s*/> { text }

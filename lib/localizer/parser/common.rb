@@ -30,6 +30,8 @@ module Localizer::Parser::Common
       %w[define].include? identifier
     when "finder"
       %w[lookupReference queryById].include? identifier
+    when "attribute"
+      not %w[override].include? identifier
     when "any"
       true
     else

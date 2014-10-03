@@ -394,7 +394,7 @@ class Localizer::Parser::Ext < KPeg::CompiledParser
     return _tmp
   end
 
-  # attribute = < meth_of_type("any"):key COLON > STRING:value COMMA:right_src {translate(prefix, key, value)}:translated_value { [text, translated_value, right_src] }
+  # attribute = < meth_of_type("attribute"):key COLON > STRING:value COMMA:right_src {translate(prefix, key, value)}:translated_value { [text, translated_value, right_src] }
   def _attribute(prefix)
 
     _save = self.pos
@@ -403,7 +403,7 @@ class Localizer::Parser::Ext < KPeg::CompiledParser
 
       _save1 = self.pos
       while true # sequence
-        _tmp = apply_with_args(:_meth_of_type, "any")
+        _tmp = apply_with_args(:_meth_of_type, "attribute")
         key = @result
         unless _tmp
           self.pos = _save1
@@ -484,12 +484,15 @@ class Localizer::Parser::Ext < KPeg::CompiledParser
     return _tmp
   end
 
-  # junk = (SEPARATOR | JUNK_EXPR)
+  # junk = (SEPARATOR | COMMA | JUNK_EXPR)
   def _junk
 
     _save = self.pos
     while true # choice
       _tmp = apply(:_SEPARATOR)
+      break if _tmp
+      self.pos = _save
+      _tmp = apply(:_COMMA)
       break if _tmp
       self.pos = _save
       _tmp = apply(:_JUNK_EXPR)
@@ -502,13 +505,13 @@ class Localizer::Parser::Ext < KPeg::CompiledParser
     return _tmp
   end
 
-  # JUNK_EXPR = < /[^;{}]+/ > { nil }
+  # JUNK_EXPR = < /[^;,{}]+/ > { nil }
   def _JUNK_EXPR
 
     _save = self.pos
     while true # sequence
       _text_start = self.pos
-      _tmp = scan(/\A(?-mix:[^;{}]+)/)
+      _tmp = scan(/\A(?-mix:[^;,{}]+)/)
       if _tmp
         text = get_text(_text_start)
       end
@@ -792,10 +795,10 @@ class Localizer::Parser::Ext < KPeg::CompiledParser
   Rules[:_scope] = rule_info("scope", "< EXT DOT meth_of_type(\"scope\"):ident LPAREN STRING:param COMMA > {join_keys(prefix, param)}:new_prefix block(new_prefix):lines_src RPAREN:right_src { [text, lines_src, right_src] }")
   Rules[:_single_call] = rule_info("single_call", "< THIS DOT meth_of_type(\"setter\"):ident LPAREN > STRING:value RPAREN:right_src {translate_setter_to_key(ident)}:key {translate(prefix, key, value)}:translated_value { [text, translated_value, right_src] }")
   Rules[:_chained_call] = rule_info("chained_call", "< THIS DOT meth_of_type(\"finder\"):ident LPAREN STRING:key RPAREN:right_src DOT meth_of_type(\"any\") LPAREN > STRING:value RPAREN:right_src {translate(prefix, key, value)}:translated_value { [text, translated_value, right_src] }")
-  Rules[:_attribute] = rule_info("attribute", "< meth_of_type(\"any\"):key COLON > STRING:value COMMA:right_src {translate(prefix, key, value)}:translated_value { [text, translated_value, right_src] }")
+  Rules[:_attribute] = rule_info("attribute", "< meth_of_type(\"attribute\"):key COLON > STRING:value COMMA:right_src {translate(prefix, key, value)}:translated_value { [text, translated_value, right_src] }")
   Rules[:_meth_of_type] = rule_info("meth_of_type", "IDENTIFIER:i &{ matches_type? i, type } { i }")
-  Rules[:_junk] = rule_info("junk", "(SEPARATOR | JUNK_EXPR)")
-  Rules[:_JUNK_EXPR] = rule_info("JUNK_EXPR", "< /[^;{}]+/ > { nil }")
+  Rules[:_junk] = rule_info("junk", "(SEPARATOR | COMMA | JUNK_EXPR)")
+  Rules[:_JUNK_EXPR] = rule_info("JUNK_EXPR", "< /[^;,{}]+/ > { nil }")
   Rules[:_SEPARATOR] = rule_info("SEPARATOR", "< /\\s*\\;\\s*/ > { nil }")
   Rules[:_OPEN] = rule_info("OPEN", "< /\\s*\\{\\s*/ > { text }")
   Rules[:_CLOSE] = rule_info("CLOSE", "< /\\s*\\}\\s*/ > { text }")
