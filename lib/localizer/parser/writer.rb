@@ -1,3 +1,4 @@
+# Helper methods available in grammar; ExtWriter overrides
 module Localizer::Parser::Writer
 
   # Handles translation in JS source.  Returns translated parameter.

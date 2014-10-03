@@ -1,3 +1,4 @@
+# Helper methods available in grammar.
 module Localizer::Parser::Common
 
   attr_accessor :locale, :translations

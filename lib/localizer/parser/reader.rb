@@ -1,3 +1,4 @@
+# Helper methods available in grammar; ExtReader overrides
 module Localizer::Parser::Reader
 
   # Adds parameter to translations.
