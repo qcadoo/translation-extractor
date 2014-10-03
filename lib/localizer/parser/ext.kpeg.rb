@@ -10,7 +10,7 @@ class Localizer::Parser::Ext < KPeg::CompiledParser
     return _tmp
   end
 
-  # lines = line(prefix)*:lines { lines.count }
+  # lines = line(prefix)*:lines { lines.flatten.join }
   def _lines(prefix)
 
     _save = self.pos
@@ -28,7 +28,7 @@ class Localizer::Parser::Ext < KPeg::CompiledParser
         self.pos = _save
         break
       end
-      @result = begin;  lines.count ; end
+      @result = begin;  lines.flatten.join ; end
       _tmp = true
       unless _tmp
         self.pos = _save
@@ -40,18 +40,75 @@ class Localizer::Parser::Ext < KPeg::CompiledParser
     return _tmp
   end
 
-  # line = (relevant(prefix) | block(prefix) | junk)
+  # line = (< relevant(prefix) > { text } | < block(prefix) > { text } | < junk > { text })
   def _line(prefix)
 
     _save = self.pos
     while true # choice
-      _tmp = apply_with_args(:_relevant, prefix)
+
+      _save1 = self.pos
+      while true # sequence
+        _text_start = self.pos
+        _tmp = apply_with_args(:_relevant, prefix)
+        if _tmp
+          text = get_text(_text_start)
+        end
+        unless _tmp
+          self.pos = _save1
+          break
+        end
+        @result = begin;  text ; end
+        _tmp = true
+        unless _tmp
+          self.pos = _save1
+        end
+        break
+      end # end sequence
+
       break if _tmp
       self.pos = _save
-      _tmp = apply_with_args(:_block, prefix)
+
+      _save2 = self.pos
+      while true # sequence
+        _text_start = self.pos
+        _tmp = apply_with_args(:_block, prefix)
+        if _tmp
+          text = get_text(_text_start)
+        end
+        unless _tmp
+          self.pos = _save2
+          break
+        end
+        @result = begin;  text ; end
+        _tmp = true
+        unless _tmp
+          self.pos = _save2
+        end
+        break
+      end # end sequence
+
       break if _tmp
       self.pos = _save
-      _tmp = apply(:_junk)
+
+      _save3 = self.pos
+      while true # sequence
+        _text_start = self.pos
+        _tmp = apply(:_junk)
+        if _tmp
+          text = get_text(_text_start)
+        end
+        unless _tmp
+          self.pos = _save3
+          break
+        end
+        @result = begin;  text ; end
+        _tmp = true
+        unless _tmp
+          self.pos = _save3
+        end
+        break
+      end # end sequence
+
       break if _tmp
       self.pos = _save
       break
@@ -542,8 +599,8 @@ class Localizer::Parser::Ext < KPeg::CompiledParser
 
   Rules = {}
   Rules[:_root] = rule_info("root", "lines(\"\")")
-  Rules[:_lines] = rule_info("lines", "line(prefix)*:lines { lines.count }")
-  Rules[:_line] = rule_info("line", "(relevant(prefix) | block(prefix) | junk)")
+  Rules[:_lines] = rule_info("lines", "line(prefix)*:lines { lines.flatten.join }")
+  Rules[:_line] = rule_info("line", "(< relevant(prefix) > { text } | < block(prefix) > { text } | < junk > { text })")
   Rules[:_relevant] = rule_info("relevant", "(single_call(prefix) | scope(prefix))")
   Rules[:_block] = rule_info("block", "OPEN lines(prefix) CLOSE")
   Rules[:_scope] = rule_info("scope", "EXT DOT meth_of_type(\"scope\"):ident LPAREN string:param COMMA {join_keys(prefix, param)}:new_prefix block(new_prefix) RPAREN")

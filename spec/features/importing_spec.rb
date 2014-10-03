@@ -41,6 +41,21 @@ describe "Localizer" do
     end
   end
 
+  example "modifying JS according to CSV translation" do
+    expected_js = File.read fixture_path("locale-en.js")
+    expected_js.sub! "this.setTitle('Projects');", "this.setTitle('Change');"
+
+    Dir.mktmpdir do |dir|
+      js_path = File.join(dir, "locale-en.js")
+      FileUtils.cp fixture_path("locale-en.js"), js_path
+      translations_file_path = fixture_path("js_translations.csv")
+
+      run "import", "-i", translations_file_path, js_path
+
+      File.read(js_path).should == expected_js
+    end
+  end
+
   def run command, *args
     Localizer::CLI.start [command, *args.flatten]
   end

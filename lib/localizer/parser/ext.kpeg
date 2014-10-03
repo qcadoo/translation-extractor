@@ -2,11 +2,11 @@
 
 root = lines("")
 
-lines(prefix) = (line(prefix)*):lines { lines.count }
+lines(prefix) = (line(prefix)*):lines { lines.flatten.join }
 
-line(prefix) = relevant(prefix)
-             | block(prefix)
-             | junk
+line(prefix) = < relevant(prefix) > { text }
+             | < block(prefix) > { text }
+             | < junk > { text }
 
 relevant(prefix) = single_call(prefix)
                  | scope(prefix)

@@ -45,6 +45,15 @@ module Localizer
       parser.parse
     end
 
+    def write_ext locale, file_path
+      source = File.read file_path
+      parser = Localizer::Parser::ExtWriter.new source
+      parser.locale = locale
+      parser.translations = translations
+      parser.parse
+      File.write file_path, parser.result
+    end
+
     def read_csv file_path
       csv = CSV.read file_path, headers: :first_row
       csv.headers == CSV_IMPORT_HEADER or raise "CSV header mismatch"
