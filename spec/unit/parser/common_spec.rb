@@ -4,7 +4,7 @@ describe "Localizer::Parser::Common" do
 
   subject{ Object.new.extend Localizer::Parser::Common }
 
-  describe "translate_setter_to_key" do
+  describe "matches_type?" do
     example "setSomeValue matches setter type" do
       subject.matches_type?("setSomeValue", "setter").should be_truthy
     end
