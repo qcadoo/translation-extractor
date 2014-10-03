@@ -11,6 +11,9 @@ describe "Localizer::Parser::Common" do
     example "define matches scope type" do
       subject.matches_type?("define", "scope").should be true
     end
+    example "create matches scope type" do
+      subject.matches_type?("create", "scope").should be true
+    end
     example "nearlyAnything matches attribute type" do
       subject.matches_type?("nearlyAnything", "attribute").should be true
     end

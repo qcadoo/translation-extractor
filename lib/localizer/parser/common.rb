@@ -28,7 +28,7 @@ module Localizer::Parser::Common
     when "setter"
       /\Aset(?=[[:upper:]])/.match(identifier).present?
     when "scope"
-      %w[define].include? identifier
+      %w[define create].include? identifier
     when "finder"
       %w[lookupReference queryById].include? identifier
     when "attribute"
