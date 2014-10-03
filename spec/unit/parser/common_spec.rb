@@ -6,16 +6,16 @@ describe "Localizer::Parser::Common" do
 
   describe "matches_type?" do
     example "setSomeValue matches setter type" do
-      subject.matches_type?("setSomeValue", "setter").should be_truthy
+      subject.matches_type?("setSomeValue", "setter").should be true
     end
     example "define matches scope type" do
-      subject.matches_type?("define", "scope").should be_truthy
+      subject.matches_type?("define", "scope").should be true
     end
     example "nearlyAnything matches attribute type" do
-      subject.matches_type?("nearlyAnything", "attribute").should be_truthy
+      subject.matches_type?("nearlyAnything", "attribute").should be true
     end
     example "override does not match attribute type" do
-      subject.matches_type?("override", "attribute").should be_falsey
+      subject.matches_type?("override", "attribute").should be false
     end
   end
 

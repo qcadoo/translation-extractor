@@ -25,7 +25,7 @@ module Localizer::Parser::Common
   def matches_type? identifier, type
     case type
     when "setter"
-      identifier =~ /\Aset(?=[[:upper:]])/
+      /\Aset(?=[[:upper:]])/.match(identifier).present?
     when "scope"
       %w[define].include? identifier
     when "finder"
