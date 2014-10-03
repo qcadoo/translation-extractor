@@ -49,6 +49,10 @@ describe "Localizer" do
       ["ads.locale.en.view.project.List.editButton", "", "Edit"],
       ["ads.locale.en.view.project.List.nameColumn", "", "Name"],
       ["ads.locale.en.view.project.List.newButton", "", "New"],
+      ["ads.locale.en.view.project.List.removeErrorTitle", "", "Remove error!"],
+      ["ads.locale.en.view.project.List.hasStagesErrorMsg", "", "Can't remove project with any stage."],
+      ["ads.locale.en.view.project.List.dateFormat", "", "d-m-Y"],
+      ["ads.locale.en.view.project.List.daysText", "", " days"],
     ].sort
   end
 
