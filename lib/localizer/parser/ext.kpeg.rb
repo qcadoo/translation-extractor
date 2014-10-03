@@ -222,7 +222,7 @@ class Localizer::Parser::Ext < KPeg::CompiledParser
     return _tmp
   end
 
-  # single_call = THIS DOT meth_of_type("setter"):ident LPAREN string:text RPAREN {setter(prefix, ident, text)}
+  # single_call = THIS DOT meth_of_type("setter"):ident LPAREN string:value RPAREN {setter(prefix, ident, value)}
   def _single_call(prefix)
 
     _save = self.pos
@@ -249,7 +249,7 @@ class Localizer::Parser::Ext < KPeg::CompiledParser
         break
       end
       _tmp = apply(:_string)
-      text = @result
+      value = @result
       unless _tmp
         self.pos = _save
         break
@@ -259,7 +259,7 @@ class Localizer::Parser::Ext < KPeg::CompiledParser
         self.pos = _save
         break
       end
-      @result = begin; setter(prefix, ident, text); end
+      @result = begin; setter(prefix, ident, value); end
       _tmp = true
       unless _tmp
         self.pos = _save
@@ -604,7 +604,7 @@ class Localizer::Parser::Ext < KPeg::CompiledParser
   Rules[:_relevant] = rule_info("relevant", "(single_call(prefix) | scope(prefix))")
   Rules[:_block] = rule_info("block", "OPEN lines(prefix) CLOSE")
   Rules[:_scope] = rule_info("scope", "EXT DOT meth_of_type(\"scope\"):ident LPAREN string:param COMMA {join_keys(prefix, param)}:new_prefix block(new_prefix) RPAREN")
-  Rules[:_single_call] = rule_info("single_call", "THIS DOT meth_of_type(\"setter\"):ident LPAREN string:text RPAREN {setter(prefix, ident, text)}")
+  Rules[:_single_call] = rule_info("single_call", "THIS DOT meth_of_type(\"setter\"):ident LPAREN string:value RPAREN {setter(prefix, ident, value)}")
   Rules[:_string] = rule_info("string", "STRING:raw {make_string(raw)}")
   Rules[:_meth_of_type] = rule_info("meth_of_type", "IDENTIFIER:i &{ matches_type? i, type } { i }")
   Rules[:_junk] = rule_info("junk", "(SEPARATOR | JUNK_EXPR)")

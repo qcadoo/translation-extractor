@@ -20,8 +20,8 @@ scope(prefix)       = EXT DOT meth_of_type("scope"):ident
                       RPAREN
 
 single_call(prefix) = THIS DOT meth_of_type("setter"):ident
-                      LPAREN string:text RPAREN
-                      ~setter(prefix, ident, text)
+                      LPAREN string:value RPAREN
+                      ~setter(prefix, ident, value)
 
 string = STRING:raw ~make_string(raw)
 
