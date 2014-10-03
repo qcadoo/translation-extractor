@@ -42,10 +42,14 @@ describe "Localizer" do
 
     out.should_not be_empty
 
-    out.should == [
+    out.sort.should == [
       ["Klucz", "Translacja polska", "Translacja angielska"],
       ["ads.locale.en.view.project.List.title", "", "Projects"],
-    ]
+      ["ads.locale.en.view.project.List.clientNameColumn", "", "Client"],
+      ["ads.locale.en.view.project.List.editButton", "", "Edit"],
+      ["ads.locale.en.view.project.List.nameColumn", "", "Name"],
+      ["ads.locale.en.view.project.List.newButton", "", "New"],
+    ].sort
   end
 
   def run command, *args

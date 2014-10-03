@@ -80,12 +80,15 @@ class Localizer::Parser::Ext < KPeg::CompiledParser
     return _tmp
   end
 
-  # relevant = (single_call(prefix) | scope(prefix))
+  # relevant = (single_call(prefix) | chained_call(prefix) | scope(prefix))
   def _relevant(prefix)
 
     _save = self.pos
     while true # choice
       _tmp = apply_with_args(:_single_call, prefix)
+      break if _tmp
+      self.pos = _save
+      _tmp = apply_with_args(:_chained_call, prefix)
       break if _tmp
       self.pos = _save
       _tmp = apply_with_args(:_scope, prefix)
@@ -288,6 +291,103 @@ class Localizer::Parser::Ext < KPeg::CompiledParser
     end # end sequence
 
     set_failed_rule :_single_call unless _tmp
+    return _tmp
+  end
+
+  # chained_call = < THIS DOT meth_of_type("finder"):ident LPAREN string:key RPAREN:right_src DOT meth_of_type("any") LPAREN > string:value RPAREN:right_src {translate(prefix, key, value)}:translated_value { [text, translated_value, right_src] }
+  def _chained_call(prefix)
+
+    _save = self.pos
+    while true # sequence
+      _text_start = self.pos
+
+      _save1 = self.pos
+      while true # sequence
+        _tmp = apply(:_THIS)
+        unless _tmp
+          self.pos = _save1
+          break
+        end
+        _tmp = apply(:_DOT)
+        unless _tmp
+          self.pos = _save1
+          break
+        end
+        _tmp = apply_with_args(:_meth_of_type, "finder")
+        ident = @result
+        unless _tmp
+          self.pos = _save1
+          break
+        end
+        _tmp = apply(:_LPAREN)
+        unless _tmp
+          self.pos = _save1
+          break
+        end
+        _tmp = apply(:_string)
+        key = @result
+        unless _tmp
+          self.pos = _save1
+          break
+        end
+        _tmp = apply(:_RPAREN)
+        right_src = @result
+        unless _tmp
+          self.pos = _save1
+          break
+        end
+        _tmp = apply(:_DOT)
+        unless _tmp
+          self.pos = _save1
+          break
+        end
+        _tmp = apply_with_args(:_meth_of_type, "any")
+        unless _tmp
+          self.pos = _save1
+          break
+        end
+        _tmp = apply(:_LPAREN)
+        unless _tmp
+          self.pos = _save1
+        end
+        break
+      end # end sequence
+
+      if _tmp
+        text = get_text(_text_start)
+      end
+      unless _tmp
+        self.pos = _save
+        break
+      end
+      _tmp = apply(:_string)
+      value = @result
+      unless _tmp
+        self.pos = _save
+        break
+      end
+      _tmp = apply(:_RPAREN)
+      right_src = @result
+      unless _tmp
+        self.pos = _save
+        break
+      end
+      @result = begin; translate(prefix, key, value); end
+      _tmp = true
+      translated_value = @result
+      unless _tmp
+        self.pos = _save
+        break
+      end
+      @result = begin;  [text, translated_value, right_src] ; end
+      _tmp = true
+      unless _tmp
+        self.pos = _save
+      end
+      break
+    end # end sequence
+
+    set_failed_rule :_chained_call unless _tmp
     return _tmp
   end
 
@@ -621,10 +721,11 @@ class Localizer::Parser::Ext < KPeg::CompiledParser
   Rules[:_root] = rule_info("root", "lines(\"\")")
   Rules[:_lines] = rule_info("lines", "line(prefix)*:lines {output(lines)}")
   Rules[:_line] = rule_info("line", "(relevant(prefix) | block(prefix) | < junk > { text })")
-  Rules[:_relevant] = rule_info("relevant", "(single_call(prefix) | scope(prefix))")
+  Rules[:_relevant] = rule_info("relevant", "(single_call(prefix) | chained_call(prefix) | scope(prefix))")
   Rules[:_block] = rule_info("block", "OPEN:op lines(prefix):li CLOSE:cl { [op, li, cl] }")
   Rules[:_scope] = rule_info("scope", "< EXT DOT meth_of_type(\"scope\"):ident LPAREN string:param COMMA > {join_keys(prefix, param)}:new_prefix block(new_prefix):lines_src RPAREN:right_src { [text, lines_src, right_src] }")
   Rules[:_single_call] = rule_info("single_call", "< THIS DOT meth_of_type(\"setter\"):ident LPAREN > string:value RPAREN:right_src {translate_setter_to_key(ident)}:key {translate(prefix, key, value)}:translated_value { [text, translated_value, right_src] }")
+  Rules[:_chained_call] = rule_info("chained_call", "< THIS DOT meth_of_type(\"finder\"):ident LPAREN string:key RPAREN:right_src DOT meth_of_type(\"any\") LPAREN > string:value RPAREN:right_src {translate(prefix, key, value)}:translated_value { [text, translated_value, right_src] }")
   Rules[:_string] = rule_info("string", "STRING:raw {make_string(raw)}")
   Rules[:_meth_of_type] = rule_info("meth_of_type", "IDENTIFIER:i &{ matches_type? i, type } { i }")
   Rules[:_junk] = rule_info("junk", "(SEPARATOR | JUNK_EXPR)")

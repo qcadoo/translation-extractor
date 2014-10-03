@@ -28,6 +28,10 @@ module Localizer::Parser::Common
       identifier =~ /\Aset(?=[[:upper:]])/
     when "scope"
       %w[define].include? identifier
+    when "finder"
+      %w[lookupReference queryById].include? identifier
+    when "any"
+      true
     else
       false
     end
@@ -43,7 +47,7 @@ module Localizer::Parser::Common
 
   # Join translation keys into one.
   def join_keys *segments
-    segments.select(&:present?).join(".")
+    segments.map(&:to_s).select(&:present?).join(".")
   end
 
 end

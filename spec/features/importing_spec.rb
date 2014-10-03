@@ -44,6 +44,8 @@ describe "Localizer" do
   example "modifying JS according to CSV translation" do
     expected_js = File.read fixture_path("locale-en.js")
     expected_js.sub! "this.setTitle('Projects');", "this.setTitle('Change');"
+    expected_js.sub! "this.lookupReference('newButton').setText('New');",
+      "this.lookupReference('newButton').setText('Newer');"
 
     Dir.mktmpdir do |dir|
       js_path = File.join(dir, "locale-en.js")
