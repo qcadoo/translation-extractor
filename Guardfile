@@ -9,5 +9,6 @@ guard :rspec, cmd: 'bundle exec rspec --color', all_on_start: true do
   watch(%r{^lib/(.+)\.rb$})           { "spec" }
   watch('spec/spec_helper.rb')        { "spec" }
   watch(%r{^spec/support/.+\.rb$})    { "spec" }
+  watch(%r{^spec/fixtures/.*$})       { "spec" }
   watch(%r{\.gemspec$})               { "spec" }
 end
