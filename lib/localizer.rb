@@ -3,6 +3,7 @@ require "localizer/version"
 require "active_support/all"
 require "csv"
 require "java-properties"
+require "json"
 require "thor"
 
 module Localizer
