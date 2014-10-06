@@ -1,8 +1,8 @@
 Ext.onReady(function() {
     Ext.create('ads.store.StageTypes',{
         data : [
-            { "name" : "Guideline", "value": "guideline"},
-            { "name" : "Project", "value": "project"}
+            { "name": "Guideline", "value": "guideline" },
+            { "name": "Project", "value": "project" }
         ]
     });
 });
