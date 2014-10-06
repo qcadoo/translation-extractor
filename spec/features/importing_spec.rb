@@ -48,6 +48,8 @@ describe "Localizer" do
       "this.lookupReference('newButton').setText('Newer');"
     expected_js.sub! '{ "name": "Guideline", "value": "guideline" },',
       '{ "name": "Principles", "value": "guideline" },'
+    expected_js.sub! "ads.app.getController('Main').errorTitle = 'Error';",
+      "ads.app.getController('Main').errorTitle = 'Fatal';"
 
     Dir.mktmpdir do |dir|
       js_path = File.join(dir, "locale-en.js")

@@ -12,6 +12,7 @@ relevant(prefix) = data_definition(prefix)
                  | attribute(prefix)
                  | single_call(prefix)
                  | chained_call(prefix)
+                 | ads_call(prefix)
                  | scope(prefix)
 
 block(prefix) = OPEN:op lines(prefix):li CLOSE:cl { [op, li, cl] }
@@ -38,6 +39,14 @@ chained_call(prefix) = < THIS DOT meth_of_type("finder"):ident
                       LPAREN > STRING:value RPAREN:right_src
                       ~translate(prefix, key, value):translated_value
                       { [text, translated_value, right_src] }
+
+# e.g. ads.app.getController('Main').errorTitle = 'Error';
+ads_call(prefix)    = < "ads" DOT "app" DOT meth_of_type("any")
+                      LPAREN STRING:key1 RPAREN
+                      DOT meth_of_type("any"):key2 ASSIGN > STRING:value
+                      ~join_keys(key1, key2):key
+                      ~translate(prefix, key, value):translated_value
+                      { [text, translated_value] }
 
 attribute(prefix)   = < meth_of_type("attribute"):key COLON > STRING:value
                       COMMA:right_src
@@ -72,6 +81,7 @@ LPAREN    = </\s*\(\s*/> { text }
 RPAREN    = </\s*\)\s*/> { text }
 COMMA     = </\s*\,\s*/> { text }
 COLON     = </\s*\:\s*/> { nil }
+ASSIGN    = </\s*\=\s*/> { text }
 LBRACK    = </\s*\[\s*/> { text }
 RBRACK    = </\s*\]\s*/> { text }
 

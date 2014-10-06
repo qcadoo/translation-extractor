@@ -5,6 +5,8 @@ Ext.onReady(function() {
             { "name": "Project", "value": "project" }
         ]
     });
+
+    ads.app.getController('Main').errorTitle = 'Error';
 });
 
 Ext.define("ads.locale.en.view.project.List", {

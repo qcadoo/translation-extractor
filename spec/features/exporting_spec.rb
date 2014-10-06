@@ -55,6 +55,7 @@ describe "Localizer" do
       ["ads.locale.en.view.project.List.daysText", "", " days"],
       ["ads.store.StageTypes.guideline", "", "Guideline"],
       ["ads.store.StageTypes.project", "", "Project"],
+      ["Main.errorTitle", "", "Error"],
     ].sort
   end
 

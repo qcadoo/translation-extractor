@@ -80,7 +80,7 @@ class Localizer::Parser::Ext < KPeg::CompiledParser
     return _tmp
   end
 
-  # relevant = (data_definition(prefix) | attribute(prefix) | single_call(prefix) | chained_call(prefix) | scope(prefix))
+  # relevant = (data_definition(prefix) | attribute(prefix) | single_call(prefix) | chained_call(prefix) | ads_call(prefix) | scope(prefix))
   def _relevant(prefix)
 
     _save = self.pos
@@ -95,6 +95,9 @@ class Localizer::Parser::Ext < KPeg::CompiledParser
       break if _tmp
       self.pos = _save
       _tmp = apply_with_args(:_chained_call, prefix)
+      break if _tmp
+      self.pos = _save
+      _tmp = apply_with_args(:_ads_call, prefix)
       break if _tmp
       self.pos = _save
       _tmp = apply_with_args(:_scope, prefix)
@@ -394,6 +397,113 @@ class Localizer::Parser::Ext < KPeg::CompiledParser
     end # end sequence
 
     set_failed_rule :_chained_call unless _tmp
+    return _tmp
+  end
+
+  # ads_call = < "ads" DOT "app" DOT meth_of_type("any") LPAREN STRING:key1 RPAREN DOT meth_of_type("any"):key2 ASSIGN > STRING:value {join_keys(key1, key2)}:key {translate(prefix, key, value)}:translated_value { [text, translated_value] }
+  def _ads_call(prefix)
+
+    _save = self.pos
+    while true # sequence
+      _text_start = self.pos
+
+      _save1 = self.pos
+      while true # sequence
+        _tmp = match_string("ads")
+        unless _tmp
+          self.pos = _save1
+          break
+        end
+        _tmp = apply(:_DOT)
+        unless _tmp
+          self.pos = _save1
+          break
+        end
+        _tmp = match_string("app")
+        unless _tmp
+          self.pos = _save1
+          break
+        end
+        _tmp = apply(:_DOT)
+        unless _tmp
+          self.pos = _save1
+          break
+        end
+        _tmp = apply_with_args(:_meth_of_type, "any")
+        unless _tmp
+          self.pos = _save1
+          break
+        end
+        _tmp = apply(:_LPAREN)
+        unless _tmp
+          self.pos = _save1
+          break
+        end
+        _tmp = apply(:_STRING)
+        key1 = @result
+        unless _tmp
+          self.pos = _save1
+          break
+        end
+        _tmp = apply(:_RPAREN)
+        unless _tmp
+          self.pos = _save1
+          break
+        end
+        _tmp = apply(:_DOT)
+        unless _tmp
+          self.pos = _save1
+          break
+        end
+        _tmp = apply_with_args(:_meth_of_type, "any")
+        key2 = @result
+        unless _tmp
+          self.pos = _save1
+          break
+        end
+        _tmp = apply(:_ASSIGN)
+        unless _tmp
+          self.pos = _save1
+        end
+        break
+      end # end sequence
+
+      if _tmp
+        text = get_text(_text_start)
+      end
+      unless _tmp
+        self.pos = _save
+        break
+      end
+      _tmp = apply(:_STRING)
+      value = @result
+      unless _tmp
+        self.pos = _save
+        break
+      end
+      @result = begin; join_keys(key1, key2); end
+      _tmp = true
+      key = @result
+      unless _tmp
+        self.pos = _save
+        break
+      end
+      @result = begin; translate(prefix, key, value); end
+      _tmp = true
+      translated_value = @result
+      unless _tmp
+        self.pos = _save
+        break
+      end
+      @result = begin;  [text, translated_value] ; end
+      _tmp = true
+      unless _tmp
+        self.pos = _save
+      end
+      break
+    end # end sequence
+
+    set_failed_rule :_ads_call unless _tmp
     return _tmp
   end
 
@@ -955,6 +1065,32 @@ class Localizer::Parser::Ext < KPeg::CompiledParser
     return _tmp
   end
 
+  # ASSIGN = < /\s*\=\s*/ > { text }
+  def _ASSIGN
+
+    _save = self.pos
+    while true # sequence
+      _text_start = self.pos
+      _tmp = scan(/\A(?-mix:\s*\=\s*)/)
+      if _tmp
+        text = get_text(_text_start)
+      end
+      unless _tmp
+        self.pos = _save
+        break
+      end
+      @result = begin;  text ; end
+      _tmp = true
+      unless _tmp
+        self.pos = _save
+      end
+      break
+    end # end sequence
+
+    set_failed_rule :_ASSIGN unless _tmp
+    return _tmp
+  end
+
   # LBRACK = < /\s*\[\s*/ > { text }
   def _LBRACK
 
@@ -1084,11 +1220,12 @@ class Localizer::Parser::Ext < KPeg::CompiledParser
   Rules[:_root] = rule_info("root", "lines(\"\")")
   Rules[:_lines] = rule_info("lines", "line(prefix)*:lines {output(lines)}")
   Rules[:_line] = rule_info("line", "(relevant(prefix) | block(prefix) | < junk > { text })")
-  Rules[:_relevant] = rule_info("relevant", "(data_definition(prefix) | attribute(prefix) | single_call(prefix) | chained_call(prefix) | scope(prefix))")
+  Rules[:_relevant] = rule_info("relevant", "(data_definition(prefix) | attribute(prefix) | single_call(prefix) | chained_call(prefix) | ads_call(prefix) | scope(prefix))")
   Rules[:_block] = rule_info("block", "OPEN:op lines(prefix):li CLOSE:cl { [op, li, cl] }")
   Rules[:_scope] = rule_info("scope", "< EXT DOT meth_of_type(\"scope\"):ident LPAREN STRING:param COMMA > {join_keys(prefix, param)}:new_prefix block(new_prefix):lines_src RPAREN:right_src { [text, lines_src, right_src] }")
   Rules[:_single_call] = rule_info("single_call", "< THIS DOT meth_of_type(\"setter\"):ident LPAREN > STRING:value RPAREN:right_src {translate_setter_to_key(ident)}:key {translate(prefix, key, value)}:translated_value { [text, translated_value, right_src] }")
   Rules[:_chained_call] = rule_info("chained_call", "< THIS DOT meth_of_type(\"finder\"):ident LPAREN STRING:key RPAREN:right_src DOT meth_of_type(\"any\") LPAREN > STRING:value RPAREN:right_src {translate(prefix, key, value)}:translated_value { [text, translated_value, right_src] }")
+  Rules[:_ads_call] = rule_info("ads_call", "< \"ads\" DOT \"app\" DOT meth_of_type(\"any\") LPAREN STRING:key1 RPAREN DOT meth_of_type(\"any\"):key2 ASSIGN > STRING:value {join_keys(key1, key2)}:key {translate(prefix, key, value)}:translated_value { [text, translated_value] }")
   Rules[:_attribute] = rule_info("attribute", "< meth_of_type(\"attribute\"):key COLON > STRING:value COMMA:right_src {translate(prefix, key, value)}:translated_value { [text, translated_value, right_src] }")
   Rules[:_data_definition] = rule_info("data_definition", "< meth_of_type(\"data\"):data COLON > json(prefix):json { [text, json] }")
   Rules[:_json] = rule_info("json", "< json_part > {translate_json(prefix, text)}:translated_json { translated_json }")
@@ -1104,6 +1241,7 @@ class Localizer::Parser::Ext < KPeg::CompiledParser
   Rules[:_RPAREN] = rule_info("RPAREN", "< /\\s*\\)\\s*/ > { text }")
   Rules[:_COMMA] = rule_info("COMMA", "< /\\s*\\,\\s*/ > { text }")
   Rules[:_COLON] = rule_info("COLON", "< /\\s*\\:\\s*/ > { nil }")
+  Rules[:_ASSIGN] = rule_info("ASSIGN", "< /\\s*\\=\\s*/ > { text }")
   Rules[:_LBRACK] = rule_info("LBRACK", "< /\\s*\\[\\s*/ > { text }")
   Rules[:_RBRACK] = rule_info("RBRACK", "< /\\s*\\]\\s*/ > { text }")
   Rules[:_STRING] = rule_info("STRING", "< /\\'([^']|\\\\.)*\\'|\\\"([^\"]|\\\\.)*\\\"/ > {make_string(text)}")
