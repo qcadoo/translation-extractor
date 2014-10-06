@@ -46,6 +46,8 @@ describe "Localizer" do
     expected_js.sub! "this.setTitle('Projects');", "this.setTitle('Change');"
     expected_js.sub! "this.lookupReference('newButton').setText('New');",
       "this.lookupReference('newButton').setText('Newer');"
+    expected_js.sub! '{ "name": "Guideline", "value": "guideline" },',
+      '{ "name": "Principles", "value": "guideline" },'
 
     Dir.mktmpdir do |dir|
       js_path = File.join(dir, "locale-en.js")
