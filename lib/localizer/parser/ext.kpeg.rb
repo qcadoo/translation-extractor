@@ -504,7 +504,7 @@ class Localizer::Parser::Ext < KPeg::CompiledParser
     return _tmp
   end
 
-  # json = < json_part > { text }
+  # json = < json_part > {translate_json(prefix, text)}:translated_json { translated_json }
   def _json(prefix)
 
     _save = self.pos
@@ -518,7 +518,14 @@ class Localizer::Parser::Ext < KPeg::CompiledParser
         self.pos = _save
         break
       end
-      @result = begin;  text ; end
+      @result = begin; translate_json(prefix, text); end
+      _tmp = true
+      translated_json = @result
+      unless _tmp
+        self.pos = _save
+        break
+      end
+      @result = begin;  translated_json ; end
       _tmp = true
       unless _tmp
         self.pos = _save
@@ -1084,7 +1091,7 @@ class Localizer::Parser::Ext < KPeg::CompiledParser
   Rules[:_chained_call] = rule_info("chained_call", "< THIS DOT meth_of_type(\"finder\"):ident LPAREN STRING:key RPAREN:right_src DOT meth_of_type(\"any\") LPAREN > STRING:value RPAREN:right_src {translate(prefix, key, value)}:translated_value { [text, translated_value, right_src] }")
   Rules[:_attribute] = rule_info("attribute", "< meth_of_type(\"attribute\"):key COLON > STRING:value COMMA:right_src {translate(prefix, key, value)}:translated_value { [text, translated_value, right_src] }")
   Rules[:_data_definition] = rule_info("data_definition", "< meth_of_type(\"data\"):data COLON > json(prefix):json { [text, json] }")
-  Rules[:_json] = rule_info("json", "< json_part > { text }")
+  Rules[:_json] = rule_info("json", "< json_part > {translate_json(prefix, text)}:translated_json { translated_json }")
   Rules[:_json_part] = rule_info("json_part", "(OPEN ((json_attr COMMA)* json_attr)? CLOSE | LBRACK ((json_part COMMA)* json_part)? RBRACK | STRING)")
   Rules[:_json_attr] = rule_info("json_attr", "STRING COLON json_part")
   Rules[:_meth_of_type] = rule_info("meth_of_type", "IDENTIFIER:i &{ matches_type? i, type } { i }")

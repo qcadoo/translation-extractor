@@ -53,6 +53,8 @@ describe "Localizer" do
       ["ads.locale.en.view.project.List.hasStagesErrorMsg", "", "Can't remove project with any stage."],
       ["ads.locale.en.view.project.List.dateFormat", "", "d-m-Y"],
       ["ads.locale.en.view.project.List.daysText", "", " days"],
+      ["ads.store.StageTypes.guideline", "", "Guideline"],
+      ["ads.store.StageTypes.project", "", "Project"],
     ].sort
   end
 

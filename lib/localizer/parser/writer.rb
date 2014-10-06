@@ -11,6 +11,11 @@ module Localizer::Parser::Writer
     end
   end
 
+  # Handles translation of composite data attributes.
+  def translate_json prefix, src
+    src
+  end
+
   # Produces parser output.  In case of Writer, concatenates all the unchanged
   # chunks of parsed source and inserted translations.
   def output lines

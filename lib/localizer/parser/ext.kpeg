@@ -48,7 +48,9 @@ data_definition(prefix) = < meth_of_type("data"):data COLON >
                           json(prefix):json
                           { [text, json] }
 
-json(prefix)        = < json_part > { text }
+json(prefix)        = < json_part >
+                      ~translate_json(prefix, text):translated_json
+                      { translated_json }
 
 json_part           = OPEN ((json_attr COMMA)* json_attr)? CLOSE
                     | LBRACK ((json_part COMMA)* json_part)? RBRACK
