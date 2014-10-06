@@ -8,7 +8,8 @@ line(prefix) = relevant(prefix)
              | block(prefix)
              | < junk > { text }
 
-relevant(prefix) = attribute(prefix)
+relevant(prefix) = data_definition(prefix)
+                 | attribute(prefix)
                  | single_call(prefix)
                  | chained_call(prefix)
                  | scope(prefix)
@@ -43,6 +44,18 @@ attribute(prefix)   = < meth_of_type("attribute"):key COLON > STRING:value
                       ~translate(prefix, key, value):translated_value
                       { [text, translated_value, right_src] }
 
+data_definition(prefix) = < meth_of_type("data"):data COLON >
+                          json(prefix):json
+                          { [text, json] }
+
+json(prefix)        = < json_part > { text }
+
+json_part           = OPEN ((json_attr COMMA)* json_attr)? CLOSE
+                    | LBRACK ((json_part COMMA)* json_part)? RBRACK
+                    | STRING
+
+json_attr           = STRING COLON json_part
+
 meth_of_type(type) = IDENTIFIER:i &{ matches_type? i, type } { i }
 
 junk = SEPARATOR
@@ -57,6 +70,9 @@ LPAREN    = </\s*\(\s*/> { text }
 RPAREN    = </\s*\)\s*/> { text }
 COMMA     = </\s*\,\s*/> { text }
 COLON     = </\s*\:\s*/> { nil }
+LBRACK    = </\s*\[\s*/> { text }
+RBRACK    = </\s*\]\s*/> { text }
+
 STRING    = </\'([^']|\\.)*\'|\"([^"]|\\.)*\"/> ~make_string(text)
 
 DOT  = "."

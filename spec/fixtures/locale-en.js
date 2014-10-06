@@ -1,3 +1,12 @@
+Ext.onReady(function() {
+    Ext.create('ads.store.StageTypes',{
+        data : [
+            { "name" : "Guideline", "value": "guideline"},
+            { "name" : "Project", "value": "project"}
+        ]
+    });
+});
+
 Ext.define("ads.locale.en.view.project.List", {
     override: "ads.view.project.List",
     dateFormat: 'd-m-Y',

@@ -33,6 +33,8 @@ module Localizer::Parser::Common
       %w[lookupReference queryById].include? identifier
     when "attribute"
       not %w[override].include? identifier
+    when "data"
+      %w[data].include? identifier
     when "any"
       true
     else
