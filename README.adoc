@@ -56,9 +56,25 @@ Run it without parameters to see help.  The executable is named
 Developing
 ----------
 
-Make sure Bundler is installed.  Then run `bundle` to install deps.  In
-terminal, run Guard: `bundle exec guard` which will rebuild parser and run specs
-when source files change.
+Make sure Bundler is installed.  Then run `bundle` to install deps.  This is
+required only once (provided that dependencies do not change).
+
+--------------------------------------------------------------------------------
+$ gem install bundler
+bundle
+--------------------------------------------------------------------------------
+
+Run Guard which will rebuild parser and run specs when source files change.
+
+--------------------------------------------------------------------------------
+$ bundle exec guard
+--------------------------------------------------------------------------------
+
+Run development version of the gem from current directory:
+
+--------------------------------------------------------------------------------
+$ bundle exec extract_translations
+--------------------------------------------------------------------------------
 
 Parser is built with kPEG, see https://github.com/evanphx/kpeg[docs].
 
