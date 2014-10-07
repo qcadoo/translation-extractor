@@ -1,5 +1,5 @@
 # Helper methods available in grammar; ExtReader overrides
-module Localizer::Parser::Reader
+module TranslationsExtractor::Parser::Reader
 
   # Adds parameter to translations.
   def translate prefix, key, text

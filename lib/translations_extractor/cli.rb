@@ -1,4 +1,4 @@
-module Localizer
+module TranslationsExtractor
   # When unsure how to modify this class, check: http://whatisthor.com/
   # or: http://blog.paracode.com/2012/05/17/building-your-tools-with-thor/
   class CLI < Thor

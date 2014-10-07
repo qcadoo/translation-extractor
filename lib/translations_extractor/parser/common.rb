@@ -1,5 +1,5 @@
 # Helper methods available in grammar.
-module Localizer::Parser::Common
+module TranslationsExtractor::Parser::Common
 
   attr_accessor :locale, :translations
 

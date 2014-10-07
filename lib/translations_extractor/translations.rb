@@ -1,4 +1,4 @@
-module Localizer
+module TranslationsExtractor
 
   # Translations database.
   class Translations < Hash

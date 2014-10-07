@@ -1,10 +1,10 @@
-module Localizer
+module TranslationsExtractor
   class Processor
 
     attr_reader :translations
 
     def initialize
-      @translations = Localizer::Translations.new
+      @translations = TranslationsExtractor::Translations.new
     end
 
     # Recognizes translatable Java properties files and JavaScript sources.
@@ -44,7 +44,7 @@ module Localizer
     # Parses JS source and adds any found translations to database.
     def read_ext locale, file_path
       source = File.read file_path
-      parser = Localizer::Parser::ExtReader.new source
+      parser = TranslationsExtractor::Parser::ExtReader.new source
       parser.locale = locale
       parser.translations = translations
       parser.parse
@@ -53,7 +53,7 @@ module Localizer
     # Parses JS source and updates it with new translations.
     def write_ext locale, file_path
       source = File.read file_path
-      parser = Localizer::Parser::ExtWriter.new source
+      parser = TranslationsExtractor::Parser::ExtWriter.new source
       parser.locale = locale
       parser.translations = translations
       parser.parse

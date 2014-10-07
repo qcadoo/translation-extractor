@@ -1,6 +1,6 @@
 require 'kpeg/compiled_parser'
 
-class Localizer::Parser::Ext < KPeg::CompiledParser
+class TranslationsExtractor::Parser::Ext < KPeg::CompiledParser
   # :stopdoc:
 
   # root = lines("")

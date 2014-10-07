@@ -6,7 +6,7 @@ require "java-properties"
 require "json"
 require "thor"
 
-module Localizer
+module TranslationsExtractor
 
   REX_LOCALE_FILE =
     /\Alocale[-_](?<locale>.+)\.(?<extension>js|javascript|properties)\Z/

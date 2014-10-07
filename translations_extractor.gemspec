@@ -5,7 +5,7 @@ require 'translations_extractor/version'
 
 Gem::Specification.new do |spec|
   spec.name          = "localizer"
-  spec.version       = Localizer::VERSION
+  spec.version       = TranslationsExtractor::VERSION
   spec.authors       = ["Sebastian Skałacki"]
   spec.email         = ["skalee@gmail.com"]
   spec.summary       = %q{Localizes Ext JS and Java properties}

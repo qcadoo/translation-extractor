@@ -1,6 +1,6 @@
 require "spec_helper"
 
-describe "Localizer" do
+describe "TranslationsExtractor" do
 
   example "generating CSV from single properties file" do
     properties_path = fixture_path("locale_pl.properties")
@@ -60,7 +60,7 @@ describe "Localizer" do
   end
 
   def run command, *args
-    Localizer::CLI.start [command, *args.flatten]
+    TranslationsExtractor::CLI.start [command, *args.flatten]
   end
 
 end

@@ -1,8 +1,8 @@
 require "spec_helper"
 
-describe "Localizer::Parser::Common" do
+describe "TranslationsExtractor::Parser::Common" do
 
-  subject{ Object.new.extend Localizer::Parser::Common }
+  subject{ Object.new.extend TranslationsExtractor::Parser::Common }
 
   describe "matches_type?" do
     example "setSomeValue matches setter type" do

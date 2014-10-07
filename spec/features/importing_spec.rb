@@ -1,6 +1,6 @@
 require "spec_helper"
 
-describe "Localizer" do
+describe "TranslationsExtractor" do
 
   example "fails when header is invalid" do
     Dir.mktmpdir do |dir|
@@ -63,7 +63,7 @@ describe "Localizer" do
   end
 
   def run command, *args
-    Localizer::CLI.start [command, *args.flatten]
+    TranslationsExtractor::CLI.start [command, *args.flatten]
   end
 
 end

@@ -1,4 +1,4 @@
-%% name = Localizer::Parser::Ext
+%% name = TranslationsExtractor::Parser::Ext
 
 root = lines("")
 
