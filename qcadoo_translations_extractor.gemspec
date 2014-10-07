@@ -4,7 +4,7 @@ $LOAD_PATH.unshift(lib) unless $LOAD_PATH.include?(lib)
 require 'translations_extractor/version'
 
 Gem::Specification.new do |spec|
-  spec.name          = "localizer"
+  spec.name          = "qcadoo_translations_extractor"
   spec.version       = TranslationsExtractor::VERSION
   spec.authors       = ["Sebastian Skałacki"]
   spec.email         = ["skalee@gmail.com"]
