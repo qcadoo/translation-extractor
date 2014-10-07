@@ -23,6 +23,12 @@ $ gem install path/to/gem/package
 where +path/to/gem/package+ points to +*.gem+ in +pkg+ directory.  Depending on
 system setup, you may need to use +sudo+.
 
+Finally, make sure that gem is in +$PATH+:
+
+--------------------------------------------------------------------------------
+$ which extract_translations
+--------------------------------------------------------------------------------
+
 
 User-wide
 ~~~~~~~~~
@@ -47,12 +53,6 @@ And then execute:
 
 --------------------------------------------------------------------------------
 $ bundle
---------------------------------------------------------------------------------
-
-Finally, make sure that gem is in +$PATH+:
-
---------------------------------------------------------------------------------
-$ which extract_translations
 --------------------------------------------------------------------------------
 
 
