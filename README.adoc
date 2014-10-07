@@ -24,6 +24,16 @@ where +path/to/gem/package+ points to +*.gem+ in +pkg+ directory.  Depending on
 system setup, you may need to use +sudo+.
 
 
+User-wide
+~~~~~~~~~
+
+--------------------------------------------------------------------------------
+$ gem install --user-install path/to/gem/package
+--------------------------------------------------------------------------------
+
+In case of problems, refer to http://guides.rubygems.org/faqs/#user-install
+
+
 Project-wide with Bundler
 ~~~~~~~~~~~~~~~~~~~~~~~~~
 
