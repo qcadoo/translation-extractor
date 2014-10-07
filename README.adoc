@@ -1,23 +1,36 @@
-Localizer
-=========
+Translations Extractor for Qcadoo
+=================================
 
 Homepage: https://github.com/qcadoo/translation-extractor
+
 
 Installation
 ------------
 
-Install it system-wide:
+Ruby 1.9.3+ is required.
+
+NOTE: Gem has not been pushed to Rubygems, thus most obvious installation
+procedure (+gem install qcadoo_translations_extractor+) will fail.
+
+
+System-wide
+~~~~~~~~~~~
 
 --------------------------------------------------------------------------------
-$ gem install localizer
+$ gem install path/to/gem/package
 --------------------------------------------------------------------------------
 
-Depending on system setup, you may need to use +sudo+.
+where +path/to/gem/package+ points to +*.gem+ in +pkg+ directory.  Depending on
+system setup, you may need to use +sudo+.
 
-Or, when using Bundler, add this line to your application's Gemfile:
+
+Project-wide with Bundler
+~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Add this line to your application's Gemfile:
 
 --------------------------------------------------------------------------------
-gem 'localizer'
+gem "qcadoo_translations_extractor", :path => path/to/gem/package/or/repo
 --------------------------------------------------------------------------------
 
 And then execute:
@@ -26,11 +39,18 @@ And then execute:
 $ bundle
 --------------------------------------------------------------------------------
 
+Finally, make sure that gem is in +$PATH+:
+
+--------------------------------------------------------------------------------
+$ which extract_translations
+--------------------------------------------------------------------------------
+
 
 Usage
 -----
 
-Run it without parameters to see help.
+Run it without parameters to see help.  The executable is named
++extract_translations+.
 
 
 Developing
@@ -41,6 +61,10 @@ terminal, run Guard: `bundle exec guard` which will rebuild parser and run specs
 when source files change.
 
 Parser is built with kPEG, see https://github.com/evanphx/kpeg[docs].
+
+In order to build new version, bump the number
+in (+lib/translations_extractor/version.rb+) and run +rake build+
+(not +release+).  Finally, add the package built (+pkg/*.gem+) to repo and push.
 
 
 Contributing
