@@ -8,7 +8,8 @@ line(prefix) = relevant(prefix)
              | block(prefix)
              | < junk > { text }
 
-relevant(prefix) = data_definition(prefix)
+relevant(prefix) = prefix_override
+                 | data_definition(prefix)
                  | attribute(prefix)
                  | single_call(prefix)
                  | chained_call(prefix)
@@ -56,6 +57,10 @@ attribute(prefix)   = < meth_of_type("attribute"):key COLON > STRING:value
 data_definition(prefix) = < meth_of_type("data"):data COLON >
                           json(prefix):json
                           { [text, json] }
+
+prefix_override     = < "override" COLON STRING:new_prefix >
+                      lines(new_prefix):li
+                      { [text, li] }
 
 json(prefix)        = < json_part >
                       ~translate_json(prefix, text):translated_json
