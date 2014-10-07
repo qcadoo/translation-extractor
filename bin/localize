@@ -3,6 +3,6 @@
 Signal.trap("INT") { exit 1 }
 
 require "bundler"
-require "localizer"
+require "translations_extractor"
 
 Localizer::CLI.start(ARGV)

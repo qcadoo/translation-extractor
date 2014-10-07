@@ -1,4 +1,4 @@
-require "localizer/version"
+require "translations_extractor/version"
 
 require "active_support/all"
 require "csv"
@@ -16,15 +16,15 @@ module Localizer
     ["Klucz", "Translacja polska", "Translacja angielska",
     "Nowa translacja polska", "Nowa translacja angielska"]
 
-  autoload :CLI, "localizer/cli"
-  autoload :Processor, "localizer/processor"
-  autoload :Translations, "localizer/translations"
+  autoload :CLI, "translations_extractor/cli"
+  autoload :Processor, "translations_extractor/processor"
+  autoload :Translations, "translations_extractor/translations"
 
   module Parser
-    autoload :Ext, "localizer/parser/ext.kpeg"
-    autoload :Common, "localizer/parser/common"
-    autoload :Reader, "localizer/parser/reader"
-    autoload :Writer, "localizer/parser/writer"
+    autoload :Ext, "translations_extractor/parser/ext.kpeg"
+    autoload :Common, "translations_extractor/parser/common"
+    autoload :Reader, "translations_extractor/parser/reader"
+    autoload :Writer, "translations_extractor/parser/writer"
 
     class ExtReader < Ext
       include Common
