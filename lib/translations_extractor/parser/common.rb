@@ -7,7 +7,13 @@ module TranslationsExtractor::Parser::Common
   # content while preserving quotation (' or ").
   ParsedString = Struct.new :raw do
     def to_s
-      raw[1..-2]
+      raw[1..-2].gsub /\\./ do |m|
+        case m
+        when %Q[\\'] then %Q[']
+        when %Q[\\"] then %Q["]
+        else m
+        end
+      end
     end
 
     # Returns new ParsedString with new content but same quotation marks.

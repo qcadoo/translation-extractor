@@ -1198,13 +1198,13 @@ class TranslationsExtractor::Parser::Ext < KPeg::CompiledParser
     return _tmp
   end
 
-  # STRING = < /\'([^']|\\.)*\'|\"([^"]|\\.)*\"/ > {make_string(text)}
+  # STRING = < /\'([^'\\]|\\.)*\'|\"([^"\\]|\\.)*\"/ > {make_string(text)}
   def _STRING
 
     _save = self.pos
     while true # sequence
       _text_start = self.pos
-      _tmp = scan(/\A(?-mix:\'([^']|\\.)*\'|\"([^"]|\\.)*\")/)
+      _tmp = scan(/\A(?-mix:\'([^'\\]|\\.)*\'|\"([^"\\]|\\.)*\")/)
       if _tmp
         text = get_text(_text_start)
       end
@@ -1300,7 +1300,7 @@ class TranslationsExtractor::Parser::Ext < KPeg::CompiledParser
   Rules[:_ASSIGN] = rule_info("ASSIGN", "< /\\s*\\=\\s*/ > { text }")
   Rules[:_LBRACK] = rule_info("LBRACK", "< /\\s*\\[\\s*/ > { text }")
   Rules[:_RBRACK] = rule_info("RBRACK", "< /\\s*\\]\\s*/ > { text }")
-  Rules[:_STRING] = rule_info("STRING", "< /\\'([^']|\\\\.)*\\'|\\\"([^\"]|\\\\.)*\\\"/ > {make_string(text)}")
+  Rules[:_STRING] = rule_info("STRING", "< /\\'([^'\\\\]|\\\\.)*\\'|\\\"([^\"\\\\]|\\\\.)*\\\"/ > {make_string(text)}")
   Rules[:_DOT] = rule_info("DOT", "\".\"")
   Rules[:_EXT] = rule_info("EXT", "\"Ext\"")
   Rules[:_THIS] = rule_info("THIS", "\"this\"")

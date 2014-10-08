@@ -90,7 +90,7 @@ ASSIGN    = </\s*\=\s*/> { text }
 LBRACK    = </\s*\[\s*/> { text }
 RBRACK    = </\s*\]\s*/> { text }
 
-STRING    = </\'([^']|\\.)*\'|\"([^"]|\\.)*\"/> ~make_string(text)
+STRING    = </\'([^'\\]|\\.)*\'|\"([^"\\]|\\.)*\"/> ~make_string(text)
 
 DOT  = "."
 EXT  = "Ext"

@@ -13,8 +13,9 @@ Ext.define("ads.locale.en.view.project.List", {
     override: "ads.view.project.List",
     dateFormat: 'd-m-Y',
     daysText : ' days',
-    removeErrorTitle: 'Remove error!',
-    hasStagesErrorMsg : "Can't remove project with any stage.",
+    removeErrorTitle: "Remove error!",
+    hasStagesErrorMsg : "Can\'t remove project with any stage.",
+    hasQuote: "Intentionally contains \" character",
 
     initComponent: function () {
         this.callParent();

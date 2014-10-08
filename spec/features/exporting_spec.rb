@@ -33,7 +33,7 @@ describe "TranslationsExtractor" do
     ]
   end
 
-  example "generating CSV from single JS source" do
+  example "generating CSV from single JS source", :focus do
     js_path = fixture_path("locale-en.js")
     output_file = Tempfile.new(%w[translations .csv], tmp_dir)
 
@@ -53,6 +53,7 @@ describe "TranslationsExtractor" do
       ["ads.view.project.List.hasStagesErrorMsg", "", "Can't remove project with any stage."],
       ["ads.view.project.List.dateFormat", "", "d-m-Y"],
       ["ads.view.project.List.daysText", "", " days"],
+      ["ads.view.project.List.hasQuote", "", "Intentionally contains \" character"],
       ["ads.store.StageTypes.guideline", "", "Guideline"],
       ["ads.store.StageTypes.project", "", "Project"],
       ["Main.errorTitle", "", "Error"],
