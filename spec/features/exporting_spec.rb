@@ -33,7 +33,7 @@ describe "TranslationsExtractor" do
     ]
   end
 
-  example "generating CSV from single JS source", :focus do
+  example "generating CSV from single JS source" do
     js_path = fixture_path("locale-en.js")
     output_file = Tempfile.new(%w[translations .csv], tmp_dir)
 
