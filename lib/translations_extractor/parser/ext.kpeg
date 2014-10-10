@@ -49,11 +49,13 @@ ads_call(prefix)    = < "ads" DOT "app" DOT meth_of_type("any")
                       ~translate(prefix, key, value):translated_value
                       { [text, translated_value] }
 
+# e.g. format: 'd-m-Y'
 attribute(prefix)   = < meth_of_type("attribute"):key COLON > STRING:value
                       COMMA:right_src
                       ~translate(prefix, key, value):translated_value
                       { [text, translated_value, right_src] }
 
+# e.g. data: [ { "name" : "Succeed", "value": "succeed"} ]
 data_definition(prefix) = < meth_of_type("data"):data COLON >
                           json(prefix):json
                           { [text, json] }

@@ -31,16 +31,32 @@ module TranslationsExtractor::Parser::Common
   # expected family of methods.
   def matches_type? identifier, type
     case type
+
+    # Simple setter method,
+    # as in this.setTitle('Projects')
     when "setter"
       /\Aset(?=[[:upper:]])/.match(identifier).present?
+
+    # Introduces translation scope,
+    # as in Ext.define("ads.locale.en.view.project.List", { ... })
     when "scope"
       %w[define create].include? identifier
+
+    # First method in chained call,
+    # as lookupReference in this.lookupReference('editButton').setText('Edit')
     when "finder"
       %w[lookupReference queryById].include? identifier
+
+    # Attribute,
+    # as in format: 'd-m-Y'
     when "attribute"
       not %w[override].include? identifier
+
+    # Data compound attribute,
+    # as in data: [ { "name" : "Succeed", "value": "succeed"} ]
     when "data"
       %w[data].include? identifier
+
     when "any"
       true
     else
