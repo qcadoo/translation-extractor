@@ -309,7 +309,7 @@ class TranslationsExtractor::Parser::Ext < KPeg::CompiledParser
     return _tmp
   end
 
-  # chained_call = < THIS DOT meth_of_type("finder"):ident LPAREN STRING:key RPAREN:right_src DOT meth_of_type("any") LPAREN > STRING:value RPAREN:right_src {translate(prefix, key, value)}:translated_value { [text, translated_value, right_src] }
+  # chained_call = < THIS DOT meth_of_type("finder"):ident LPAREN STRING:key RPAREN DOT meth_of_type("any") LPAREN > STRING:value RPAREN:right_src {translate(prefix, key, value)}:translated_value { [text, translated_value, right_src] }
   def _chained_call(prefix)
 
     _save = self.pos
@@ -346,7 +346,6 @@ class TranslationsExtractor::Parser::Ext < KPeg::CompiledParser
           break
         end
         _tmp = apply(:_RPAREN)
-        right_src = @result
         unless _tmp
           self.pos = _save1
           break
@@ -406,7 +405,7 @@ class TranslationsExtractor::Parser::Ext < KPeg::CompiledParser
     return _tmp
   end
 
-  # chained_with_assignment = < THIS DOT meth_of_type("finder"):ident LPAREN STRING:key RPAREN:right_src DOT meth_of_type("any") ASSIGN > STRING:value {translate(prefix, key, value)}:translated_value { [text, translated_value] }
+  # chained_with_assignment = < THIS DOT meth_of_type("finder"):ident LPAREN STRING:key RPAREN DOT meth_of_type("any") ASSIGN > STRING:value {translate(prefix, key, value)}:translated_value { [text, translated_value] }
   def _chained_with_assignment(prefix)
 
     _save = self.pos
@@ -443,7 +442,6 @@ class TranslationsExtractor::Parser::Ext < KPeg::CompiledParser
           break
         end
         _tmp = apply(:_RPAREN)
-        right_src = @result
         unless _tmp
           self.pos = _save1
           break
@@ -1373,8 +1371,8 @@ class TranslationsExtractor::Parser::Ext < KPeg::CompiledParser
   Rules[:_block] = rule_info("block", "OPEN:op lines(prefix):li CLOSE:cl { [op, li, cl] }")
   Rules[:_scope] = rule_info("scope", "< EXT DOT meth_of_type(\"scope\"):ident LPAREN STRING:param COMMA > {join_keys(prefix, param)}:new_prefix block(new_prefix):lines_src RPAREN:right_src { [text, lines_src, right_src] }")
   Rules[:_single_call] = rule_info("single_call", "< THIS DOT meth_of_type(\"setter\"):ident LPAREN > STRING:value RPAREN:right_src {translate_setter_to_key(ident)}:key {translate(prefix, key, value)}:translated_value { [text, translated_value, right_src] }")
-  Rules[:_chained_call] = rule_info("chained_call", "< THIS DOT meth_of_type(\"finder\"):ident LPAREN STRING:key RPAREN:right_src DOT meth_of_type(\"any\") LPAREN > STRING:value RPAREN:right_src {translate(prefix, key, value)}:translated_value { [text, translated_value, right_src] }")
-  Rules[:_chained_with_assignment] = rule_info("chained_with_assignment", "< THIS DOT meth_of_type(\"finder\"):ident LPAREN STRING:key RPAREN:right_src DOT meth_of_type(\"any\") ASSIGN > STRING:value {translate(prefix, key, value)}:translated_value { [text, translated_value] }")
+  Rules[:_chained_call] = rule_info("chained_call", "< THIS DOT meth_of_type(\"finder\"):ident LPAREN STRING:key RPAREN DOT meth_of_type(\"any\") LPAREN > STRING:value RPAREN:right_src {translate(prefix, key, value)}:translated_value { [text, translated_value, right_src] }")
+  Rules[:_chained_with_assignment] = rule_info("chained_with_assignment", "< THIS DOT meth_of_type(\"finder\"):ident LPAREN STRING:key RPAREN DOT meth_of_type(\"any\") ASSIGN > STRING:value {translate(prefix, key, value)}:translated_value { [text, translated_value] }")
   Rules[:_ads_call] = rule_info("ads_call", "< \"ads\" DOT \"app\" DOT meth_of_type(\"any\") LPAREN STRING:key1 RPAREN DOT meth_of_type(\"any\"):key2 ASSIGN > STRING:value {join_keys(key1, key2)}:key {translate(prefix, key, value)}:translated_value { [text, translated_value] }")
   Rules[:_attribute] = rule_info("attribute", "< meth_of_type(\"attribute\"):key COLON > STRING:value COMMA:right_src {translate(prefix, key, value)}:translated_value { [text, translated_value, right_src] }")
   Rules[:_data_definition] = rule_info("data_definition", "< meth_of_type(\"data\"):data COLON > json(prefix):json { [text, json] }")

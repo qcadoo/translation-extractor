@@ -36,7 +36,7 @@ single_call(prefix) = < THIS DOT meth_of_type("setter"):ident
 
 # e.g. this.lookupReference('editButton').setText('Edit')
 chained_call(prefix)  = < THIS DOT meth_of_type("finder"):ident
-                        LPAREN STRING:key RPAREN:right_src
+                        LPAREN STRING:key RPAREN
                         DOT meth_of_type("any")
                         LPAREN > STRING:value RPAREN:right_src
                         ~translate(prefix, key, value):translated_value
@@ -45,7 +45,7 @@ chained_call(prefix)  = < THIS DOT meth_of_type("finder"):ident
 # e.g. this.lookupReference('tooltippedButton').tooltip = 'Button tooltip';
 chained_with_assignment(prefix)
                       = < THIS DOT meth_of_type("finder"):ident
-                        LPAREN STRING:key RPAREN:right_src
+                        LPAREN STRING:key RPAREN
                         DOT meth_of_type("any")
                         ASSIGN > STRING:value
                         ~translate(prefix, key, value):translated_value
