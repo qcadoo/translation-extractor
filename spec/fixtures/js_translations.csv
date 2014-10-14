@@ -3,4 +3,4 @@
 "ads.view.project.List.newButton.text","Nowy","New","Nowszy","Newer"
 "ads.store.StageTypes.guideline","Wytyczne","Guideline","Pryncypia","Principles"
 "Main.errorTitle","Błąd","Error","Wywrotka","Fatal"
-"ads.view.project.List.tooltippedButton","Podpowiedź","Button tooltip","Nowa podpowiedź","New tooltip"
+"ads.view.project.List.tooltippedButton.tooltip","Podpowiedź","Button tooltip","Nowa podpowiedź","New tooltip"

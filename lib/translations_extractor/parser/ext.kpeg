@@ -41,10 +41,11 @@ chained_call(prefix)  = < THIS DOT meth_of_type("finder"):ident
 # e.g. this.lookupReference('tooltippedButton').tooltip = 'Button tooltip';
 chained_with_assignment(prefix)
                       = < THIS DOT meth_of_type("finder"):ident
-                        LPAREN STRING:key RPAREN
-                        DOT meth_of_type("any")
+                        LPAREN STRING:element_prefix RPAREN
+                        DOT meth_of_type("any"):key
                         ASSIGN > STRING:value
-                        ~translate(prefix, key, value):translated_value
+                        ~join_keys(prefix, element_prefix):joined_prefix
+                        ~translate(joined_prefix, key, value):translated_value
                         { [text, translated_value] }
 
 # e.g. ads.app.getController('Main').errorTitle = 'Error';

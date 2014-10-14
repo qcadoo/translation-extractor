@@ -339,7 +339,7 @@ class TranslationsExtractor::Parser::Ext < KPeg::CompiledParser
     return _tmp
   end
 
-  # chained_with_assignment = < THIS DOT meth_of_type("finder"):ident LPAREN STRING:key RPAREN DOT meth_of_type("any") ASSIGN > STRING:value {translate(prefix, key, value)}:translated_value { [text, translated_value] }
+  # chained_with_assignment = < THIS DOT meth_of_type("finder"):ident LPAREN STRING:element_prefix RPAREN DOT meth_of_type("any"):key ASSIGN > STRING:value {join_keys(prefix, element_prefix)}:joined_prefix {translate(joined_prefix, key, value)}:translated_value { [text, translated_value] }
   def _chained_with_assignment(prefix)
 
     _save = self.pos
@@ -370,7 +370,7 @@ class TranslationsExtractor::Parser::Ext < KPeg::CompiledParser
           break
         end
         _tmp = apply(:_STRING)
-        key = @result
+        element_prefix = @result
         unless _tmp
           self.pos = _save1
           break
@@ -386,6 +386,7 @@ class TranslationsExtractor::Parser::Ext < KPeg::CompiledParser
           break
         end
         _tmp = apply_with_args(:_meth_of_type, "any")
+        key = @result
         unless _tmp
           self.pos = _save1
           break
@@ -410,7 +411,14 @@ class TranslationsExtractor::Parser::Ext < KPeg::CompiledParser
         self.pos = _save
         break
       end
-      @result = begin; translate(prefix, key, value); end
+      @result = begin; join_keys(prefix, element_prefix); end
+      _tmp = true
+      joined_prefix = @result
+      unless _tmp
+        self.pos = _save
+        break
+      end
+      @result = begin; translate(joined_prefix, key, value); end
       _tmp = true
       translated_value = @result
       unless _tmp
@@ -1378,7 +1386,7 @@ class TranslationsExtractor::Parser::Ext < KPeg::CompiledParser
   Rules[:_scope] = rule_info("scope", "< EXT DOT meth_of_type(\"scope\"):ident LPAREN STRING:param COMMA > {join_keys(prefix, param)}:new_prefix block(new_prefix):lines_src RPAREN:right_src { [text, lines_src, right_src] }")
   Rules[:_single_call] = rule_info("single_call", "< THIS > setter_call(prefix):translated_call { [text, translated_call] }")
   Rules[:_chained_call] = rule_info("chained_call", "< THIS DOT meth_of_type(\"finder\"):ident LPAREN STRING:element_prefix RPAREN > {join_keys(prefix, element_prefix)}:chained_setter_prefix setter_call(chained_setter_prefix):translated_call { [text, translated_call] }")
-  Rules[:_chained_with_assignment] = rule_info("chained_with_assignment", "< THIS DOT meth_of_type(\"finder\"):ident LPAREN STRING:key RPAREN DOT meth_of_type(\"any\") ASSIGN > STRING:value {translate(prefix, key, value)}:translated_value { [text, translated_value] }")
+  Rules[:_chained_with_assignment] = rule_info("chained_with_assignment", "< THIS DOT meth_of_type(\"finder\"):ident LPAREN STRING:element_prefix RPAREN DOT meth_of_type(\"any\"):key ASSIGN > STRING:value {join_keys(prefix, element_prefix)}:joined_prefix {translate(joined_prefix, key, value)}:translated_value { [text, translated_value] }")
   Rules[:_ads_call] = rule_info("ads_call", "< \"ads\" DOT \"app\" DOT meth_of_type(\"any\") LPAREN STRING:key1 RPAREN DOT meth_of_type(\"any\"):key2 ASSIGN > STRING:value {join_keys(key1, key2)}:key {translate(prefix, key, value)}:translated_value { [text, translated_value] }")
   Rules[:_attribute] = rule_info("attribute", "< meth_of_type(\"attribute\"):key COLON > STRING:value COMMA:right_src {translate(prefix, key, value)}:translated_value { [text, translated_value, right_src] }")
   Rules[:_data_definition] = rule_info("data_definition", "< meth_of_type(\"data\"):data COLON > json(prefix):json { [text, json] }")
