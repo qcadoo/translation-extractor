@@ -1,6 +1,6 @@
 "Klucz","Translacja polska","Translacja angielska","Nowa translacja polska","Nowa translacja angielska"
 "ads.view.project.List.title","Projekty","Projects","Zmiana","Change"
-"ads.view.project.List.newButton","Nowy","New","Nowszy","Newer"
+"ads.view.project.List.newButton.text","Nowy","New","Nowszy","Newer"
 "ads.store.StageTypes.guideline","Wytyczne","Guideline","Pryncypia","Principles"
 "Main.errorTitle","Błąd","Error","Wywrotka","Fatal"
 "ads.view.project.List.tooltippedButton","Podpowiedź","Button tooltip","Nowa podpowiedź","New tooltip"

@@ -232,38 +232,13 @@ class TranslationsExtractor::Parser::Ext < KPeg::CompiledParser
     return _tmp
   end
 
-  # single_call = < THIS DOT meth_of_type("setter"):ident LPAREN > STRING:value RPAREN:right_src {translate_setter_to_key(ident)}:key {translate(prefix, key, value)}:translated_value { [text, translated_value, right_src] }
+  # single_call = < THIS > setter_call(prefix):translated_call { [text, translated_call] }
   def _single_call(prefix)
 
     _save = self.pos
     while true # sequence
       _text_start = self.pos
-
-      _save1 = self.pos
-      while true # sequence
-        _tmp = apply(:_THIS)
-        unless _tmp
-          self.pos = _save1
-          break
-        end
-        _tmp = apply(:_DOT)
-        unless _tmp
-          self.pos = _save1
-          break
-        end
-        _tmp = apply_with_args(:_meth_of_type, "setter")
-        ident = @result
-        unless _tmp
-          self.pos = _save1
-          break
-        end
-        _tmp = apply(:_LPAREN)
-        unless _tmp
-          self.pos = _save1
-        end
-        break
-      end # end sequence
-
+      _tmp = apply(:_THIS)
       if _tmp
         text = get_text(_text_start)
       end
@@ -271,33 +246,13 @@ class TranslationsExtractor::Parser::Ext < KPeg::CompiledParser
         self.pos = _save
         break
       end
-      _tmp = apply(:_STRING)
-      value = @result
+      _tmp = apply_with_args(:_setter_call, prefix)
+      translated_call = @result
       unless _tmp
         self.pos = _save
         break
       end
-      _tmp = apply(:_RPAREN)
-      right_src = @result
-      unless _tmp
-        self.pos = _save
-        break
-      end
-      @result = begin; translate_setter_to_key(ident); end
-      _tmp = true
-      key = @result
-      unless _tmp
-        self.pos = _save
-        break
-      end
-      @result = begin; translate(prefix, key, value); end
-      _tmp = true
-      translated_value = @result
-      unless _tmp
-        self.pos = _save
-        break
-      end
-      @result = begin;  [text, translated_value, right_src] ; end
+      @result = begin;  [text, translated_call] ; end
       _tmp = true
       unless _tmp
         self.pos = _save
@@ -309,7 +264,7 @@ class TranslationsExtractor::Parser::Ext < KPeg::CompiledParser
     return _tmp
   end
 
-  # chained_call = < THIS DOT meth_of_type("finder"):ident LPAREN STRING:key RPAREN DOT meth_of_type("any") LPAREN > STRING:value RPAREN:right_src {translate(prefix, key, value)}:translated_value { [text, translated_value, right_src] }
+  # chained_call = < THIS DOT meth_of_type("finder"):ident LPAREN STRING:element_prefix RPAREN > {join_keys(prefix, element_prefix)}:chained_setter_prefix setter_call(chained_setter_prefix):translated_call { [text, translated_call] }
   def _chained_call(prefix)
 
     _save = self.pos
@@ -340,27 +295,12 @@ class TranslationsExtractor::Parser::Ext < KPeg::CompiledParser
           break
         end
         _tmp = apply(:_STRING)
-        key = @result
+        element_prefix = @result
         unless _tmp
           self.pos = _save1
           break
         end
         _tmp = apply(:_RPAREN)
-        unless _tmp
-          self.pos = _save1
-          break
-        end
-        _tmp = apply(:_DOT)
-        unless _tmp
-          self.pos = _save1
-          break
-        end
-        _tmp = apply_with_args(:_meth_of_type, "any")
-        unless _tmp
-          self.pos = _save1
-          break
-        end
-        _tmp = apply(:_LPAREN)
         unless _tmp
           self.pos = _save1
         end
@@ -374,26 +314,20 @@ class TranslationsExtractor::Parser::Ext < KPeg::CompiledParser
         self.pos = _save
         break
       end
-      _tmp = apply(:_STRING)
-      value = @result
-      unless _tmp
-        self.pos = _save
-        break
-      end
-      _tmp = apply(:_RPAREN)
-      right_src = @result
-      unless _tmp
-        self.pos = _save
-        break
-      end
-      @result = begin; translate(prefix, key, value); end
+      @result = begin; join_keys(prefix, element_prefix); end
       _tmp = true
-      translated_value = @result
+      chained_setter_prefix = @result
       unless _tmp
         self.pos = _save
         break
       end
-      @result = begin;  [text, translated_value, right_src] ; end
+      _tmp = apply_with_args(:_setter_call, chained_setter_prefix)
+      translated_call = @result
+      unless _tmp
+        self.pos = _save
+        break
+      end
+      @result = begin;  [text, translated_call] ; end
       _tmp = true
       unless _tmp
         self.pos = _save
@@ -706,6 +640,78 @@ class TranslationsExtractor::Parser::Ext < KPeg::CompiledParser
     end # end sequence
 
     set_failed_rule :_data_definition unless _tmp
+    return _tmp
+  end
+
+  # setter_call = < DOT meth_of_type("setter"):ident LPAREN > STRING:value RPAREN:right_src {translate_setter_to_key(ident)}:key {translate(prefix, key, value)}:translated_value { [text, translated_value, right_src] }
+  def _setter_call(prefix)
+
+    _save = self.pos
+    while true # sequence
+      _text_start = self.pos
+
+      _save1 = self.pos
+      while true # sequence
+        _tmp = apply(:_DOT)
+        unless _tmp
+          self.pos = _save1
+          break
+        end
+        _tmp = apply_with_args(:_meth_of_type, "setter")
+        ident = @result
+        unless _tmp
+          self.pos = _save1
+          break
+        end
+        _tmp = apply(:_LPAREN)
+        unless _tmp
+          self.pos = _save1
+        end
+        break
+      end # end sequence
+
+      if _tmp
+        text = get_text(_text_start)
+      end
+      unless _tmp
+        self.pos = _save
+        break
+      end
+      _tmp = apply(:_STRING)
+      value = @result
+      unless _tmp
+        self.pos = _save
+        break
+      end
+      _tmp = apply(:_RPAREN)
+      right_src = @result
+      unless _tmp
+        self.pos = _save
+        break
+      end
+      @result = begin; translate_setter_to_key(ident); end
+      _tmp = true
+      key = @result
+      unless _tmp
+        self.pos = _save
+        break
+      end
+      @result = begin; translate(prefix, key, value); end
+      _tmp = true
+      translated_value = @result
+      unless _tmp
+        self.pos = _save
+        break
+      end
+      @result = begin;  [text, translated_value, right_src] ; end
+      _tmp = true
+      unless _tmp
+        self.pos = _save
+      end
+      break
+    end # end sequence
+
+    set_failed_rule :_setter_call unless _tmp
     return _tmp
   end
 
@@ -1370,12 +1376,13 @@ class TranslationsExtractor::Parser::Ext < KPeg::CompiledParser
   Rules[:_relevant] = rule_info("relevant", "(prefix_override | data_definition(prefix) | attribute(prefix) | single_call(prefix) | chained_call(prefix) | chained_with_assignment(prefix) | ads_call(prefix) | scope(prefix))")
   Rules[:_block] = rule_info("block", "OPEN:op lines(prefix):li CLOSE:cl { [op, li, cl] }")
   Rules[:_scope] = rule_info("scope", "< EXT DOT meth_of_type(\"scope\"):ident LPAREN STRING:param COMMA > {join_keys(prefix, param)}:new_prefix block(new_prefix):lines_src RPAREN:right_src { [text, lines_src, right_src] }")
-  Rules[:_single_call] = rule_info("single_call", "< THIS DOT meth_of_type(\"setter\"):ident LPAREN > STRING:value RPAREN:right_src {translate_setter_to_key(ident)}:key {translate(prefix, key, value)}:translated_value { [text, translated_value, right_src] }")
-  Rules[:_chained_call] = rule_info("chained_call", "< THIS DOT meth_of_type(\"finder\"):ident LPAREN STRING:key RPAREN DOT meth_of_type(\"any\") LPAREN > STRING:value RPAREN:right_src {translate(prefix, key, value)}:translated_value { [text, translated_value, right_src] }")
+  Rules[:_single_call] = rule_info("single_call", "< THIS > setter_call(prefix):translated_call { [text, translated_call] }")
+  Rules[:_chained_call] = rule_info("chained_call", "< THIS DOT meth_of_type(\"finder\"):ident LPAREN STRING:element_prefix RPAREN > {join_keys(prefix, element_prefix)}:chained_setter_prefix setter_call(chained_setter_prefix):translated_call { [text, translated_call] }")
   Rules[:_chained_with_assignment] = rule_info("chained_with_assignment", "< THIS DOT meth_of_type(\"finder\"):ident LPAREN STRING:key RPAREN DOT meth_of_type(\"any\") ASSIGN > STRING:value {translate(prefix, key, value)}:translated_value { [text, translated_value] }")
   Rules[:_ads_call] = rule_info("ads_call", "< \"ads\" DOT \"app\" DOT meth_of_type(\"any\") LPAREN STRING:key1 RPAREN DOT meth_of_type(\"any\"):key2 ASSIGN > STRING:value {join_keys(key1, key2)}:key {translate(prefix, key, value)}:translated_value { [text, translated_value] }")
   Rules[:_attribute] = rule_info("attribute", "< meth_of_type(\"attribute\"):key COLON > STRING:value COMMA:right_src {translate(prefix, key, value)}:translated_value { [text, translated_value, right_src] }")
   Rules[:_data_definition] = rule_info("data_definition", "< meth_of_type(\"data\"):data COLON > json(prefix):json { [text, json] }")
+  Rules[:_setter_call] = rule_info("setter_call", "< DOT meth_of_type(\"setter\"):ident LPAREN > STRING:value RPAREN:right_src {translate_setter_to_key(ident)}:key {translate(prefix, key, value)}:translated_value { [text, translated_value, right_src] }")
   Rules[:_prefix_override] = rule_info("prefix_override", "< \"override\" COLON STRING:new_prefix > lines(new_prefix):li { [text, li] }")
   Rules[:_json] = rule_info("json", "< json_part > {translate_json(prefix, text)}:translated_json { translated_json }")
   Rules[:_json_part] = rule_info("json_part", "(OPEN ((json_attr COMMA)* json_attr)? CLOSE | LBRACK ((json_part COMMA)* json_part)? RBRACK | STRING)")

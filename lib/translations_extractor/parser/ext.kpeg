@@ -28,19 +28,15 @@ scope(prefix)       = < EXT DOT meth_of_type("scope"):ident
                       { [text, lines_src, right_src] }
 
 # e.g. this.setTitle('Projects')
-single_call(prefix) = < THIS DOT meth_of_type("setter"):ident
-                      LPAREN > STRING:value RPAREN:right_src
-                      ~translate_setter_to_key(ident):key
-                      ~translate(prefix, key, value):translated_value
-                      { [text, translated_value, right_src] }
+single_call(prefix)   = < THIS > setter_call(prefix):translated_call
+                      { [text, translated_call] }
 
 # e.g. this.lookupReference('editButton').setText('Edit')
 chained_call(prefix)  = < THIS DOT meth_of_type("finder"):ident
-                        LPAREN STRING:key RPAREN
-                        DOT meth_of_type("any")
-                        LPAREN > STRING:value RPAREN:right_src
-                        ~translate(prefix, key, value):translated_value
-                        { [text, translated_value, right_src] }
+                        LPAREN STRING:element_prefix RPAREN >
+                        ~join_keys(prefix, element_prefix):chained_setter_prefix
+                        setter_call(chained_setter_prefix):translated_call
+                        { [text, translated_call] }
 
 # e.g. this.lookupReference('tooltippedButton').tooltip = 'Button tooltip';
 chained_with_assignment(prefix)
@@ -69,6 +65,12 @@ attribute(prefix)   = < meth_of_type("attribute"):key COLON > STRING:value
 data_definition(prefix) = < meth_of_type("data"):data COLON >
                           json(prefix):json
                           { [text, json] }
+
+setter_call(prefix) = < DOT meth_of_type("setter"):ident
+                      LPAREN > STRING:value RPAREN:right_src
+                      ~translate_setter_to_key(ident):key
+                      ~translate(prefix, key, value):translated_value
+                      { [text, translated_value, right_src] }
 
 prefix_override     = < "override" COLON STRING:new_prefix >
                       lines(new_prefix):li
