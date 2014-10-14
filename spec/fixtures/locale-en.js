@@ -23,6 +23,7 @@ Ext.define("ads.locale.en.view.project.List", {
         this.setTitle('Projects');
         this.lookupReference('newButton').setText('New');
         this.lookupReference('editButton').setText('Edit');
+        this.lookupReference('tooltippedButton').tooltip = 'Button tooltip';
 
         this.queryById('clientNameColumn').setText('Client');
         this.queryById('nameColumn').setText('Name');

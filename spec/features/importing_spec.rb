@@ -50,6 +50,8 @@ describe "TranslationsExtractor" do
       '{ "name": "Principles", "value": "guideline" },'
     expected_js.sub! "ads.app.getController('Main').errorTitle = 'Error';",
       "ads.app.getController('Main').errorTitle = 'Fatal';"
+    expected_js.sub! "this.lookupReference('tooltippedButton').tooltip = 'Button tooltip';",
+      "this.lookupReference('tooltippedButton').tooltip = 'New tooltip';"
 
     Dir.mktmpdir do |dir|
       js_path = File.join(dir, "locale-en.js")

@@ -13,6 +13,7 @@ relevant(prefix) = prefix_override
                  | attribute(prefix)
                  | single_call(prefix)
                  | chained_call(prefix)
+                 | chained_with_assignment(prefix)
                  | ads_call(prefix)
                  | scope(prefix)
 
@@ -34,12 +35,21 @@ single_call(prefix) = < THIS DOT meth_of_type("setter"):ident
                       { [text, translated_value, right_src] }
 
 # e.g. this.lookupReference('editButton').setText('Edit')
-chained_call(prefix) = < THIS DOT meth_of_type("finder"):ident
-                      LPAREN STRING:key RPAREN:right_src
-                      DOT meth_of_type("any")
-                      LPAREN > STRING:value RPAREN:right_src
-                      ~translate(prefix, key, value):translated_value
-                      { [text, translated_value, right_src] }
+chained_call(prefix)  = < THIS DOT meth_of_type("finder"):ident
+                        LPAREN STRING:key RPAREN:right_src
+                        DOT meth_of_type("any")
+                        LPAREN > STRING:value RPAREN:right_src
+                        ~translate(prefix, key, value):translated_value
+                        { [text, translated_value, right_src] }
+
+# e.g. this.lookupReference('tooltippedButton').tooltip = 'Button tooltip';
+chained_with_assignment(prefix)
+                      = < THIS DOT meth_of_type("finder"):ident
+                        LPAREN STRING:key RPAREN:right_src
+                        DOT meth_of_type("any")
+                        ASSIGN > STRING:value
+                        ~translate(prefix, key, value):translated_value
+                        { [text, translated_value] }
 
 # e.g. ads.app.getController('Main').errorTitle = 'Error';
 ads_call(prefix)    = < "ads" DOT "app" DOT meth_of_type("any")

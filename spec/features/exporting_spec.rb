@@ -47,6 +47,7 @@ describe "TranslationsExtractor" do
       ["ads.view.project.List.title", "", "Projects"],
       ["ads.view.project.List.clientNameColumn", "", "Client"],
       ["ads.view.project.List.editButton", "", "Edit"],
+      ["ads.view.project.List.tooltippedButton", "", "Button tooltip"],
       ["ads.view.project.List.nameColumn", "", "Name"],
       ["ads.view.project.List.newButton", "", "New"],
       ["ads.view.project.List.removeErrorTitle", "", "Remove error!"],
